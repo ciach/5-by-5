@@ -229,7 +229,6 @@ ahistorycyzm
 ahistoryzm
 ailant
 aintelektualizm
-ais-moll
 ajatollah
 ajbis
 ajbisz
@@ -791,7 +790,6 @@ anulus
 anyż
 anyżek
 aojda
-aor.
 aoryst
 apach
 apaj
@@ -879,7 +877,6 @@ archiwariusz
 archiwista
 archont
 archozaur
-arcy-Polak
 arcybiskup
 arcydzięgiel
 arcykapłan
@@ -949,7 +946,6 @@ arystotelizm
 arytmetyk
 arywista
 as
-as-moll
 asambl
 asamblaż
 asamski
@@ -1072,7 +1068,6 @@ ausdruk
 ausgus
 ausgust
 auspuc
-b-moll
 baasista
 babakoto
 babczur
@@ -1510,7 +1505,6 @@ bestseler
 bestseller
 beszamel
 bet
-beta-karoten
 betel
 betlejemczyk
 betlejemita
@@ -1556,7 +1550,6 @@ bezwstydnik
 bi
 białas
 białkomocz
-biało-czerwony
 białobrzuszek
 białogwardzista
 białoruski
@@ -2140,7 +2133,6 @@ buduchyjski
 budulec
 budyń
 budynek
-c-moll
 cachurski
 cadilac
 cadillac
@@ -2334,7 +2326,6 @@ chiastolit
 chichot
 chief
 chihuahua
-chill-oucik
 chilloucik
 chin
 chinalugijski
@@ -2367,7 +2358,6 @@ chłopaczek
 chłopak
 chłopczyk
 chłopek
-chłopek-roztropek
 chłopiec
 chłopina
 chłopisko
@@ -2570,7 +2560,6 @@ ciołek
 ciómp
 cios
 cis
-cis-moll
 cisural
 citalopram
 ciuch
@@ -2605,7 +2594,6 @@ cmentarzyk
 ćmoczek
 ćmok
 ćmuch
-cocker-spaniel
 coelhizm
 cokół
 colon
@@ -2861,8 +2849,6 @@ człon
 członek
 człowieczek
 człowieczysko
-d-ca
-d-moll
 dąb
 dabigatran
 dach
@@ -3145,7 +3131,6 @@ diopsyd
 dioteletyzm
 dip
 diplodok
-dis-moll
 disulfoton
 ditlenek
 dławigad
@@ -3678,13 +3663,6 @@ dziewięciokąt
 dziewięciolatek
 dziewięciopak
 dziewięciościan
-e-czytnik
-e-dziennik
-e-moll
-e-palacz
-e-papieros
-e-podręcznik
-e-zin
 eastern
 ebenista
 eblaicki
@@ -3748,7 +3726,6 @@ ejds
 ejektor
 ejrometr
 ejszyszczanin
-eka-pierwiastek
 eklektyzm
 ekler
 eklogit
@@ -3969,7 +3946,6 @@ erywańczyk
 erzac
 erzjański
 es
-es-moll
 esauł
 esbek
 eschatokół
@@ -4063,7 +4039,6 @@ ewolucjonizm
 ewzon
 eżektor
 ezetymib
-f-moll
 fabianczanin
 fabianizm
 fabianowianin
@@ -4348,7 +4323,6 @@ firlejanin
 firmamencik
 firmament
 firmant
-fis-moll
 fiskus
 fistaszek
 fiszbin
@@ -4534,7 +4508,6 @@ frankfurtczyk
 frankista
 franklin
 franknowianin
-franko-prowansalski
 frankofil
 frankofob
 frankofon
@@ -4562,7 +4535,6 @@ froncik
 front
 fronton
 frontonik
-g-moll
 gabarycik
 gabaryjok
 gabaryt
@@ -4714,7 +4686,6 @@ gen
 genealog
 genealogista
 generał
-generał-gubernator
 generalissimus
 generator
 genewczyk
@@ -4785,8 +4756,6 @@ gips
 girobusola
 giroklinometr
 girokompas
-gis-moll
-gis-moll
 giser
 git
 gitarzysta
@@ -5082,7 +5051,6 @@ gruchacz
 gruchot
 gruczoł
 gruczolak
-h-moll
 habdank
 habicik
 habit
@@ -5353,7 +5321,6 @@ hinduista
 hinduizm
 hiob
 hiobek
-hip-hop
 hipcio
 hipermarkecik
 hipermarket
@@ -5386,7 +5353,6 @@ hitlerowiec
 hitleryzm
 hiw
 hłudnianin
-ho-hoń
 hoacyn
 hobbit
 hobel
@@ -5799,7 +5765,6 @@ judaizm
 judasz
 judaszowiec
 judel
-judeo-arabski
 judeochrześcijanin
 judeosceptyk
 judofob
@@ -6083,7 +6048,6 @@ karabin
 karabińczyk
 karabinek
 karabinier
-karaczajsko-bałkarski
 karaczan
 karafijoł
 karafioł
@@ -6335,7 +6299,6 @@ kibuc
 kić
 kicik
 kiciuś
-kick-boxing
 kicz
 kieł
 kiełb
@@ -6524,7 +6487,6 @@ kliper
 klips
 klister
 klistron
-klituś-bajduś
 kliwer
 kliwerbom
 klobocon
@@ -6594,7 +6556,6 @@ kniaź
 knoblech
 knobloch
 knocik
-knock-out
 knorr
 knot
 knur
@@ -6646,7 +6607,6 @@ kodon
 kodopis
 kodziarz
 kofeinizm
-kogel-mogel
 kognat
 kognitywizm
 kogucik
@@ -6763,8 +6723,6 @@ komeraż
 komers
 komforcik
 komfort
-komi-permiacki
-komi-zyriański
 komik
 komiks
 komin
@@ -8595,7 +8553,6 @@ mielony
 mierniczy
 miernik
 mierny
-mies.
 mięsaczek
 mięsak
 miesiąc
@@ -9357,10 +9314,6 @@ nicpoń
 nicpota
 nicpotok
 nidziczanin
-nie-Górnoślązak
-nie-Japończyk
-nie-Polak
-nie-Żyd
 niebianin
 niebieski
 nieboraczek
@@ -9890,7 +9843,6 @@ onoterapeuta
 onyks
 oolog
 op
-op-art
 opad
 opal
 opał
@@ -10822,7 +10774,6 @@ pinakiel
 pinczer
 pińczowianin
 pindol
-ping-pong
 pingwin
 pingwinek
 pinióndz
@@ -11053,7 +11004,6 @@ podejźrzon
 podeścik
 podest
 podfolder
-podgat.
 podgatunek
 podgląd
 podglądacz
@@ -11174,7 +11124,6 @@ pokrowiec
 pokurcz
 pokusiciel
 pokutnik
-pół-Polak
 połabski
 polaczek
 polaj
@@ -11618,7 +11567,6 @@ prikaz
 priorytecik
 priorytet
 priporitet
-pro-lifer
 probiotyk
 problem
 problemista
@@ -12038,7 +11986,6 @@ psychoterapeuta
 psychotest
 psychotrop
 pszczelarz
-pszczoło-jamnik
 pszczynianin
 pszociel
 pszonaczek
@@ -12101,7 +12048,6 @@ punicki
 punkcik
 punkt
 punktowiec
-r.
 rab
 rabacik
 raban
@@ -12584,7 +12530,6 @@ rozwiedziony
 rozwód
 rozwodnik
 rozwój
-rtg.
 rubel
 rubid
 rubin
@@ -12929,7 +12874,6 @@ serafin
 seraj
 serak
 serbski
-serbsko-chorwacki
 sercanin
 sercowiec
 serdaczek
@@ -13314,7 +13258,6 @@ smerfuś
 śmigłowcowiec
 śmigłowiec
 śmigus
-śmigus-dyngus
 śmiyngus
 śmiyrgus
 smoczek
@@ -13577,7 +13520,6 @@ srebrnodziobek
 średniak
 średnian
 średnik
-średnio-wysoko-niemiecki
 średnioangielski
 średniodystansowiec
 średniopłat
@@ -13616,7 +13558,6 @@ stalowiec
 stalowowolanin
 stambułczyk
 stan
-stand-up
 standard
 stangret
 stanik
@@ -14112,7 +14053,6 @@ szablonik
 szabrownik
 szac
 szach
-szacher-macher
 szachinszach
 szachista
 szachraj
@@ -14629,8 +14569,6 @@ talon
 talonik
 talyrz
 tałyski
-tam-tam
-tam-tamista
 tamaszek
 tamborek
 tamburmajor
@@ -14862,7 +14800,6 @@ tilbury
 timer
 tindyjski
 tingel
-tingel-tangel
 tioarsenian
 tioeter
 tip
@@ -15254,7 +15191,6 @@ tuńczyk
 tunel
 tunelik
 tunetańczyk
-u-boot
 ubaw
 ubek
 ubiór
@@ -16190,7 +16126,6 @@ wyjgwajzer
 wykaz
 wykazik
 wykidajło
-z-ca
 zaawansowany
 ząb
 zabaniaczek
@@ -16562,7 +16497,6 @@ zelter
 zelus
 żemlok
 zen
-żeń-szeń
 żeniszek
 zenit
 zeppelin
