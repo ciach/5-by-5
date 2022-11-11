@@ -16,6 +16,8 @@ from random import choice
 import numpy as np
 from rich.console import Console
 from rich import print as rich_print
+from rich.columns import Columns
+from rich.panel import Panel
 from core_func import my_bad_function
 
 
@@ -51,7 +53,7 @@ def set_first_word(word_, orientation="horizontal"):
         )
 
 
-def add_letter(letter, pos_x, pos_y):
+def add_letter(letter_, pos_x, pos_y):
     """Adds a letter to the game ARRAYay
 
     Args:
@@ -59,7 +61,7 @@ def add_letter(letter, pos_x, pos_y):
         x (int): X position in ARRAYay
         y (int): Y position in ARRAYay
     """
-    ARRAY[pos_x, pos_y] = letter.capitalize()
+    ARRAY[pos_x, pos_y] = letter_.capitalize()
 
 
 def start_word(lenght, words_dict_path) -> str:
@@ -142,8 +144,7 @@ def cell_inside(cell) -> bool:
     cellx, celly = cell[0], cell[1]
     x_pos = (cellx >= MIN) and (cellx < ROWS)
     y_pos = (celly >= MIN) and (celly < COLS)
-    if (x_pos, y_pos) == (True, True):
-        return True
+    return (x_pos, y_pos) == (True, True)
 
 
 def cell_neighbors(cell) -> list:
@@ -219,56 +220,60 @@ if __name__ == "__main__":
     console = Console()
     cls()
     ARRAY = create_array(ROWS, COLS)
-    START_WORD = (
-        "błysk"  # start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
-    )
+    START_WORD = start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
     # set_first_word(start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"))
     set_first_word(START_WORD)
-    show_array()
-
-    d = cells_to_play()
-    # print(d)
-    e = my_bad_function(d)
-    # print(len(e), type(e))  # we have list with possible paths
-
-    # inform if no path found
-    if len(e) == 0:
-        print("No path found!")
-
-    f = possible_words_list(e)  # we have dict with possible words and paths
-    # print(possible_words_list(e))
-
     # list of words already played
-    words_played = [START_WORD]
-    print(f"words_played: {words_played}")
-    # here we'll store all words that can be played in current stage
-    # but not the ones that are already played
-    current_state_words = []
-
-    for key, path in f.items():
-        answer = find_word(key, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
-        if len(answer) > 0:
-            # if any word from answer list is in words_played list
-            # then this word should be removed from answer list
-            # if aswer list has only one word then answer should not be add to current_state_words
-            for word in answer:
-                if word in words_played:
-                    answer.remove(word)
-            # in this moment we do not have repeated words in answer list
-            if answer:
-                current_state_words.append([len(answer[0]), answer, path])
-
-    sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
-    max_lenght = sorted_current_state_words[0][0]
-
-    # word to play next
-    next_word_list = choice(
-        [x for x in sorted_current_state_words if x[0] == max_lenght]
-    )
-    next_word = choice(next_word_list[1])
-    for letter, position in zip(next_word, next_word_list[2]):
-        add_letter(letter, position[0], position[1])
-    print("\n", next_word, next_word_list[2], "\n")
-    words_played.append(next_word)
+    words_played = [START_WORD.strip()]
     print(f"words_played: {words_played}")
     show_array()
+    while True:
+        # TODO: need check if there is any free cell to play
+        # if not # in array than break
+        d = cells_to_play()
+        if len(d) == 0:
+            print("No more moves")
+            break
+        # print(d)
+        e = my_bad_function(d)
+        # print(len(e), type(e))  # we have list with possible paths
+
+        # inform if no path found
+        if len(e) == 0:
+            print("No path found!")
+            break
+
+        f = possible_words_list(e)  # we have dict with possible words and paths
+        # print(possible_words_list(e))
+
+        # here we'll store all words that can be played in current stage
+        # but not the ones that are already played
+        current_state_words = []
+
+        for key, path in f.items():
+            answer = find_word(key, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
+            if len(answer) > 0:
+                # if any word from answer list is in words_played list
+                # then this word should be removed from answer list
+                # if aswer list has only one word then answer should not be add to current_state_words
+                for word in answer:
+                    if word in words_played:
+                        answer.remove(word)
+                # in this moment we do not have repeated words in answer list
+                if answer:
+                    current_state_words.append([len(answer[0]), answer, path])
+
+        sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
+        max_lenght = sorted_current_state_words[0][0]
+
+        # word to play next
+        next_word_list = choice(
+            [x for x in sorted_current_state_words if x[0] == max_lenght]
+        )
+        next_word = choice(next_word_list[1])
+        for letter, position in zip(next_word, next_word_list[2]):
+            add_letter(letter, position[0], position[1])
+        print(f"\n new word: {next_word} {next_word_list[2]} \n")
+        words_played.append(next_word)
+        print(f"words_played: {words_played} \n")
+        show_array()
