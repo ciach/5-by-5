@@ -36,15 +36,15 @@ def cls():
 # WORDS FUNCTIONS
 
 
-def set_first_word(word, orientation="horizontal"):
+def set_first_word(word_, orientation="horizontal"):
     """Sets the first word in the array"""
-    word = word.upper()
+    word_ = word_.upper()
     if orientation == "horizontal":
         for cell in range(ROWS):
-            ARRAY[floor(COLS / 2)][cell] = str(word[cell])
+            ARRAY[floor(COLS / 2)][cell] = str(word_[cell])
     elif orientation == "vertical":
         for cell in range(ROWS):
-            ARRAY[cell][floor(COLS / 2)] = str(word[cell])
+            ARRAY[cell][floor(COLS / 2)] = str(word_[cell])
     else:
         raise ValueError(
             "Invalid word orientation, should be 'vertical' or 'horizontal'"
@@ -79,7 +79,7 @@ def start_word(lenght, words_dict_path) -> str:
     return choice(words_list)
 
 
-def find_word(word, words_dict_path) -> list:
+def find_word(word_, words_dict_path) -> list:
     """Finds the words matching the given criteria in the "word" variable
     by looking into the wordsDictPath
 
@@ -90,15 +90,15 @@ def find_word(word, words_dict_path) -> list:
     Returns:
         list: with word matching critiria from "word" variable
     """
-    word = word.replace("#", ".").lower()
+    word_ = word_.replace("#", ".").lower()
 
     # rich_print(f"{word}")
-    reg = re_compile(word)
+    reg = re_compile(word_)
     words_list = []
     with open(Path(words_dict_path), "r", encoding="UTF-8") as file:
         for line in file:
             line = line.rstrip()
-            if bool(match(reg, line)) and (len(line) == len(word)):
+            if bool(match(reg, line)) and (len(line) == len(word_)):
                 words_list.append(line)
     file.close()
     return words_list
@@ -201,10 +201,10 @@ def possible_words_list(paths_list) -> dict:
         dict: _description_
     """
     possible_words = {}
-    for path in paths_list:
-        word = [ARRAY[item] for item in path]
-        if word.count("#") == 1:  # should have only one free space
-            possible_words["".join(word)] = path
+    for path_ in paths_list:
+        word_ = [ARRAY[item] for item in path_]
+        if word_.count("#") == 1:  # should have only one free space
+            possible_words["".join(word_)] = path_
     return possible_words
 
 
@@ -219,8 +219,11 @@ if __name__ == "__main__":
     console = Console()
     cls()
     ARRAY = create_array(ROWS, COLS)
+    START_WORD = (
+        "błysk"  # start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
+    )
     # set_first_word(start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"))
-    set_first_word("mural")
+    set_first_word(START_WORD)
     show_array()
 
     d = cells_to_play()
@@ -228,11 +231,44 @@ if __name__ == "__main__":
     e = my_bad_function(d)
     # print(len(e), type(e))  # we have list with possible paths
 
+    # inform if no path found
+    if len(e) == 0:
+        print("No path found!")
+
     f = possible_words_list(e)  # we have dict with possible words and paths
     # print(possible_words_list(e))
 
-    # here we have all words that can be played in current stage
+    # list of words already played
+    words_played = [START_WORD]
+    print(f"words_played: {words_played}")
+    # here we'll store all words that can be played in current stage
+    # but not the ones that are already played
+    current_state_words = []
+
     for key, path in f.items():
         answer = find_word(key, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
         if len(answer) > 0:
-            print(f"{answer} - {path}")
+            # if any word from answer list is in words_played list
+            # then this word should be removed from answer list
+            # if aswer list has only one word then answer should not be add to current_state_words
+            for word in answer:
+                if word in words_played:
+                    answer.remove(word)
+            # in this moment we do not have repeated words in answer list
+            if answer:
+                current_state_words.append([len(answer[0]), answer, path])
+
+    sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
+    max_lenght = sorted_current_state_words[0][0]
+
+    # word to play next
+    next_word_list = choice(
+        [x for x in sorted_current_state_words if x[0] == max_lenght]
+    )
+    next_word = choice(next_word_list[1])
+    for letter, position in zip(next_word, next_word_list[2]):
+        add_letter(letter, position[0], position[1])
+    print("\n", next_word, next_word_list[2], "\n")
+    words_played.append(next_word)
+    print(f"words_played: {words_played}")
+    show_array()
