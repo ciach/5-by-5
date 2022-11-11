@@ -1,6 +1,11 @@
 """ That's a very poorly writen function, but it does its job.
     I think it should be recursive function. I don't know how to do it.
     Low code quality, but it works.
+
+    TODO: should add check if the possible path contains only one empty
+    space (#), if not we should not add it to the list
+    in that case we should be quicker a bit.
+    Despite the poor quality code
 """
 
 
