@@ -9,6 +9,7 @@
 from math import floor
 from re import compile as re_compile
 from re import match
+from time import perf_counter
 import os
 from pathlib import Path
 from itertools import product
@@ -228,9 +229,10 @@ if __name__ == "__main__":
     # add_letter("b", 1, 0)
     # list of words already played
     words_played = [START_WORD.strip()]
-    print(f"words_played: {words_played}")
+    console.print(f"words_played: [blue]{words_played[0]}[/blue]")
     show_array()
     while True:
+        start = perf_counter()
         # TODO: need check if there are any free cell to play
         # if not # in array than break
         d = cells_to_play()
@@ -238,7 +240,7 @@ if __name__ == "__main__":
         # print(e, len(e), type(e))  # we have list with possible paths
         # inform if no path found
         if len(e) == 0:
-            print("No path found!")
+            console.print("No path found! Exiting...", style="bold red")
             break
 
         f = possible_words_list(e)  # we have dict with possible words and paths
@@ -270,7 +272,9 @@ if __name__ == "__main__":
         next_word = choice(next_word_list[1])
         for letter, position in zip(next_word, next_word_list[2]):
             add_letter(letter, position[0], position[1])
-        print(f"\n new word: {next_word} {next_word_list[2]} \n")
+        console.print(f"\nNew word: [blue]{next_word}[/blue] {next_word_list[2]}")
         words_played.append(next_word)
-        print(f"words_played: {words_played} \n")
+        console.print(f"Words played: {words_played}.")
+        end = perf_counter()
+        console.print(f"It took me: {end - start:.2f} seconds to find last word.\n")
         show_array()
