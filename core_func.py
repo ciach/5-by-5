@@ -9,7 +9,7 @@
 """
 
 
-def my_bad_function(my_dict) -> list:
+def my_bad_function(my_array, my_dict) -> list:
     """_summary_
 
     Args:
@@ -79,79 +79,165 @@ def my_bad_function(my_dict) -> list:
                                                                                     ii_,
                                                                                 ]
                                                                             ):
-                                                                                steps_list.append(
-                                                                                    [
-                                                                                        aa_,
-                                                                                        bb_,
-                                                                                        cc_,
-                                                                                        dd_,
-                                                                                        ee_,
-                                                                                        ff_,
-                                                                                        gg_,
-                                                                                        hh_,
-                                                                                        ii_,
-                                                                                        jj_,
+                                                                                path_ = [
+                                                                                    aa_,
+                                                                                    bb_,
+                                                                                    cc_,
+                                                                                    dd_,
+                                                                                    ee_,
+                                                                                    ff_,
+                                                                                    gg_,
+                                                                                    hh_,
+                                                                                    ii_,
+                                                                                    jj_,
+                                                                                ]
+                                                                                word_ = [
+                                                                                    my_array[
+                                                                                        item
                                                                                     ]
-                                                                                )
+                                                                                    for item in path_
+                                                                                ]
+                                                                                if (
+                                                                                    word_.count(
+                                                                                        "#"
+                                                                                    )
+                                                                                    == 1
+                                                                                ):
+                                                                                    steps_list.append(
+                                                                                        [
+                                                                                            path_
+                                                                                        ]
+                                                                                    )
                                                                             else:
-                                                                                steps_list.append(
-                                                                                    [
-                                                                                        aa_,
-                                                                                        bb_,
-                                                                                        cc_,
-                                                                                        dd_,
-                                                                                        ee_,
-                                                                                        ff_,
-                                                                                        gg_,
-                                                                                        hh_,
-                                                                                        ii_,
+                                                                                path_ = [
+                                                                                    aa_,
+                                                                                    bb_,
+                                                                                    cc_,
+                                                                                    dd_,
+                                                                                    ee_,
+                                                                                    ff_,
+                                                                                    gg_,
+                                                                                    hh_,
+                                                                                    ii_,
+                                                                                ]
+                                                                                word_ = [
+                                                                                    my_array[
+                                                                                        item
                                                                                     ]
-                                                                                )
+                                                                                    for item in path_
+                                                                                ]
+                                                                                if (
+                                                                                    word_.count(
+                                                                                        "#"
+                                                                                    )
+                                                                                    == 1
+                                                                                ):
+                                                                                    steps_list.append(
+                                                                                        [
+                                                                                            path_
+                                                                                        ]
+                                                                                    )
                                                                     else:
-                                                                        steps_list.append(
-                                                                            [
-                                                                                aa_,
-                                                                                bb_,
-                                                                                cc_,
-                                                                                dd_,
-                                                                                ee_,
-                                                                                ff_,
-                                                                                gg_,
-                                                                                hh_,
+                                                                        path_ = [
+                                                                            aa_,
+                                                                            bb_,
+                                                                            cc_,
+                                                                            dd_,
+                                                                            ee_,
+                                                                            ff_,
+                                                                            gg_,
+                                                                            hh_,
+                                                                        ]
+                                                                        word_ = [
+                                                                            my_array[
+                                                                                item
                                                                             ]
-                                                                        )
+                                                                            for item in path_
+                                                                        ]
+                                                                        if (
+                                                                            word_.count(
+                                                                                "#"
+                                                                            )
+                                                                            == 1
+                                                                        ):
+                                                                            steps_list.append(
+                                                                                [path_]
+                                                                            )
                                                             else:
-                                                                steps_list.append(
-                                                                    [
-                                                                        aa_,
-                                                                        bb_,
-                                                                        cc_,
-                                                                        dd_,
-                                                                        ee_,
-                                                                        ff_,
-                                                                        gg_,
-                                                                    ]
-                                                                )
+                                                                path_ = [
+                                                                    aa_,
+                                                                    bb_,
+                                                                    cc_,
+                                                                    dd_,
+                                                                    ee_,
+                                                                    ff_,
+                                                                    gg_,
+                                                                ]
+                                                                word_ = [
+                                                                    my_array[item]
+                                                                    for item in path_
+                                                                ]
+                                                                if (
+                                                                    word_.count("#")
+                                                                    == 1
+                                                                ):
+                                                                    steps_list.append(
+                                                                        [path_]
+                                                                    )
                                                     else:
-                                                        steps_list.append(
-                                                            [
-                                                                aa_,
-                                                                bb_,
-                                                                cc_,
-                                                                dd_,
-                                                                ee_,
-                                                                ff_,
-                                                            ]
-                                                        )
+                                                        path_ = [
+                                                            aa_,
+                                                            bb_,
+                                                            cc_,
+                                                            dd_,
+                                                            ee_,
+                                                            ff_,
+                                                        ]
+                                                        word_ = [
+                                                            my_array[item]
+                                                            for item in path_
+                                                        ]
+                                                        if word_.count("#") == 1:
+                                                            steps_list.append([path_])
                                             else:
-                                                steps_list.append(
-                                                    [aa_, bb_, cc_, dd_, ee_]
-                                                )
+                                                path_ = [
+                                                    aa_,
+                                                    bb_,
+                                                    cc_,
+                                                    dd_,
+                                                    ee_,
+                                                ]
+                                                word_ = [
+                                                    my_array[item] for item in path_
+                                                ]
+                                                if word_.count("#") == 1:
+                                                    steps_list.append([path_])
                                     else:
-                                        steps_list.append([aa_, bb_, cc_, dd_])
+                                        path_ = [
+                                            aa_,
+                                            bb_,
+                                            cc_,
+                                            dd_,
+                                        ]
+                                        word_ = [my_array[item] for item in path_]
+                                        if word_.count("#") == 1:
+                                            steps_list.append([path_])
                             else:
-                                steps_list.append([aa_, bb_, cc_])
+                                path_ = [
+                                    aa_,
+                                    bb_,
+                                    cc_,
+                                ]
+                                word_ = [my_array[item] for item in path_]
+                                if word_.count("#") == 1:
+                                    steps_list.append([path_])
                     else:
-                        steps_list.append([aa_, bb_])
+                        path_ = [
+                            aa_,
+                            bb_,
+                        ]
+                        word_ = [my_array[item] for item in path_]
+                        if word_.count("#") == 1:
+                            steps_list.append([path_])
 
     return steps_list
