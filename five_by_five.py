@@ -234,7 +234,7 @@ if __name__ == "__main__":
         # TODO: need check if there are any free cell to play
         # if not # in array than break
         d = cells_to_play()
-        e = my_bad_function(d)
+        e = my_bad_function(ARRAY, d)
         # print(e, len(e), type(e))  # we have list with possible paths
         # inform if no path found
         if len(e) == 0:
