@@ -229,18 +229,16 @@ if __name__ == "__main__":
     # add_letter("b", 1, 0)
     # list of words already played
     words_played = [START_WORD.strip()]
-    console.print(f"words_played: [blue]{words_played[0]}[/blue]")
+    # console.print(f"words_played: [blue]{words_played[0]}[/blue]")
     show_array()
     while True:
         start = perf_counter()
-        # TODO: need check if there are any free cell to play
-        # if not # in array than break
         d = cells_to_play()
         e = my_bad_function(ARRAY, d)
         # print(e, len(e), type(e))  # we have list with possible paths
         # inform if no path found
         if len(e) == 0:
-            console.print("No path found! Exiting...", style="bold red")
+            console.print("\nFinished! Exiting...", style="red")
             break
 
         f = possible_words_list(e)  # we have dict with possible words and paths
@@ -277,4 +275,7 @@ if __name__ == "__main__":
         console.print(f"Words played: {words_played}.")
         end = perf_counter()
         console.print(f"It took me: {end - start:.2f} seconds to find last word.\n")
+        # users = [words_played]
+        user_renderables = [Panel(user, expand=True) for user in words_played]
+        console.print(Columns(user_renderables))
         show_array()
