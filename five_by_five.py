@@ -196,10 +196,11 @@ def possible_words_list(paths_list) -> dict:
     """_summary_
 
     Args:
-        paths_list (_type_): _description_
+        paths_list (list): list of lists containing posible paths indicated
+        by cell position. Eg: [[(1,0), (2,0)], [(1,0), (2,0), (3, 0)]
 
     Returns:
-        dict: _description_
+        dict: possible word as key and path as item. Eg.: {'#A': [(1, 0), (2, 0)]}
     """
     possible_words = {}
     for path_ in paths_list:
@@ -223,28 +224,24 @@ if __name__ == "__main__":
     START_WORD = start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
     # set_first_word(start_word(5, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"))
     set_first_word(START_WORD)
+    # add_letter("a", 3, 0)
+    # add_letter("b", 1, 0)
     # list of words already played
     words_played = [START_WORD.strip()]
     print(f"words_played: {words_played}")
     show_array()
     while True:
-        # TODO: need check if there is any free cell to play
+        # TODO: need check if there are any free cell to play
         # if not # in array than break
         d = cells_to_play()
-        if len(d) == 0:
-            print("No more moves")
-            break
-        # print(d)
         e = my_bad_function(d)
-        # print(len(e), type(e))  # we have list with possible paths
-
+        # print(e, len(e), type(e))  # we have list with possible paths
         # inform if no path found
         if len(e) == 0:
             print("No path found!")
             break
 
         f = possible_words_list(e)  # we have dict with possible words and paths
-        # print(possible_words_list(e))
 
         # here we'll store all words that can be played in current stage
         # but not the ones that are already played
