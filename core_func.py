@@ -104,9 +104,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                                                                     == 1
                                                                                 ):
                                                                                     steps_list.append(
-                                                                                        [
-                                                                                            path_
-                                                                                        ]
+                                                                                        path_
                                                                                     )
                                                                             else:
                                                                                 path_ = [
@@ -133,9 +131,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                                                                     == 1
                                                                                 ):
                                                                                     steps_list.append(
-                                                                                        [
-                                                                                            path_
-                                                                                        ]
+                                                                                        path_
                                                                                     )
                                                                     else:
                                                                         path_ = [
@@ -161,7 +157,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                                                             == 1
                                                                         ):
                                                                             steps_list.append(
-                                                                                [path_]
+                                                                                path_
                                                                             )
                                                             else:
                                                                 path_ = [
@@ -182,7 +178,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                                                     == 1
                                                                 ):
                                                                     steps_list.append(
-                                                                        [path_]
+                                                                        path_
                                                                     )
                                                     else:
                                                         path_ = [
@@ -198,7 +194,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                                             for item in path_
                                                         ]
                                                         if word_.count("#") == 1:
-                                                            steps_list.append([path_])
+                                                            steps_list.append(path_)
                                             else:
                                                 path_ = [
                                                     aa_,
@@ -211,7 +207,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                                     my_array[item] for item in path_
                                                 ]
                                                 if word_.count("#") == 1:
-                                                    steps_list.append([path_])
+                                                    steps_list.append(path_)
                                     else:
                                         path_ = [
                                             aa_,
@@ -221,7 +217,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                         ]
                                         word_ = [my_array[item] for item in path_]
                                         if word_.count("#") == 1:
-                                            steps_list.append([path_])
+                                            steps_list.append(path_)
                             else:
                                 path_ = [
                                     aa_,
@@ -230,7 +226,7 @@ def my_bad_function(my_array, my_dict) -> list:
                                 ]
                                 word_ = [my_array[item] for item in path_]
                                 if word_.count("#") == 1:
-                                    steps_list.append([path_])
+                                    steps_list.append(path_)
                     else:
                         path_ = [
                             aa_,
@@ -238,6 +234,6 @@ def my_bad_function(my_array, my_dict) -> list:
                         ]
                         word_ = [my_array[item] for item in path_]
                         if word_.count("#") == 1:
-                            steps_list.append([path_])
+                            steps_list.append(path_)
 
     return steps_list
