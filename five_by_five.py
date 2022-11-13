@@ -233,8 +233,7 @@ if __name__ == "__main__":
     show_array()
     while True:
         start = perf_counter()
-        d = cells_to_play()
-        e = my_bad_function(ARRAY, d)
+        e = my_bad_function(ARRAY, cells_to_play())
         # print(e, len(e), type(e))  # we have list with possible paths
         # inform if no path found
         if len(e) == 0:
