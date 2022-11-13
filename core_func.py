@@ -13,6 +13,7 @@ def my_bad_function(my_array, my_dict) -> list:
     """_summary_
 
     Args:
+        my_array (list): list of lists containing the game board
         my_dict (dict): dictionary with possible moves
 
     Returns:
