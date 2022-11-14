@@ -249,17 +249,11 @@ if __name__ == "__main__":
         for key, path in f.items():
             answer = find_word(key, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
             if len(answer) > 0:
-                # if any word from answer list is in words_played list
-                # then this word should be removed from answer list
-                # if aswer list has only one word then answer should not be add to current_state_words
-                for word in answer:
-                    if word in words_played:
-                        answer.remove(word)
-                # in this moment we do not have repeated words in answer list
-                if answer:
-                    current_state_words.append([len(answer[0]), answer, path])
+                if mod_answer := [word for word in answer if word not in words_played]:
+                    current_state_words.append([len(answer[0]), mod_answer, path])
 
         sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
+        print(len(sorted_current_state_words))
         max_lenght = sorted_current_state_words[0][0]
 
         # word to play next
