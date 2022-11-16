@@ -23,7 +23,7 @@ def set_first_word(my_array, rows, cols, word_, orientation="horizontal"):
         )
 
 
-def add_letter(my_array, letter_, pos_x, pos_y):
+def add_letter(my_array: list, letter_: str, pos_x: int, pos_y: int):
     """Adds a letter to the games array
 
     Args:
@@ -75,3 +75,23 @@ def find_word(word_, words_dict_path) -> list:
                 words_list.append(line)
     file.close()
     return words_list
+
+
+def check_user_word(user_word_: str, words_dict_path) -> bool:
+    """_summary_
+
+    Args:
+        user_word (str): _description_
+
+    Returns:
+        bool: _description_
+    """
+    if user_word_:
+        # check if the word is in the file
+        with open(Path(words_dict_path), "r", encoding="UTF-8") as file:
+            for line in file:
+                line = line.rstrip()
+                if line == user_word_:
+                    file.close()
+                    return True
+    return False

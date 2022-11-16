@@ -116,3 +116,24 @@ def cells_to_play(my_array: list, empty_char: str) -> dict:
         for cell in cells
         if step(cell, my_array, empty_char)
     }
+
+
+def check_user_path(user_path: list, my_array: list, empty_char: str) -> bool:
+    """_summary_
+
+    Args:
+        user_path (list): list of cell positions
+        my_array (list): list of lists containing the array
+
+    Returns:
+        bool: if the path is valid
+
+    if len(user_path) < 3:
+        return False
+    else:
+        for cell in user_path:
+            if cell not in cells_to_play(my_array, empty_char):
+                return False
+        return True
+    """
+    return True

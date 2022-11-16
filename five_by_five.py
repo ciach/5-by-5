@@ -19,12 +19,19 @@ from cells_func import (
     cell_inside,
     cell_neighbors,
     cells_to_play,
+    check_user_path,
     create_array,
     possible_words_list,
     show_array,
     step,
 )
-from words_func import add_letter, find_word, start_word, set_first_word
+from words_func import (
+    add_letter,
+    check_user_word,
+    find_word,
+    start_word,
+    set_first_word,
+)
 
 ARRAY = []
 ROWS, COLS = (5, 5)
@@ -83,7 +90,29 @@ if __name__ == "__main__":
     logging.debug("first word: %s", START_WORD.strip())
     # console.print(f"words_played: [blue]{words_played[0]}[/blue]")
     show_array(ARRAY)
+
     while True:
+        # user starts to play
+        user_word = input("Enter word (to pass press ENTER):")
+        if check_user_word(
+            user_word, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"
+        ):
+            console.print("Word is correct!")
+            user_path_str = input("Enter path in format x1,y1, x2,y2, ..., xn,yn: ")
+            fs = user_path_str.split(" ")
+            user_path = [tuple(map(int, i.split(","))) for i in fs]
+            if check_user_path(user_path, ARRAY, "#"):
+                console.print("Word path is correct!")
+                console.print(
+                    f"Your word is: [blue]{user_word}[/blue] and path is: [blue]{user_path}[/blue]"
+                )
+                for letter, position in zip(user_word, user_path):
+                    print(letter, position)
+                    add_letter(ARRAY, letter, position[0], position[1])
+                words_played.append(user_word)
+                show_array(ARRAY)
+
+        # computer starts to play
         start = perf_counter()
         e = my_bad_function(ARRAY, cells_to_play(ARRAY, "#"))
         # print(e, len(e), type(e))  # we have list with possible paths
@@ -119,6 +148,7 @@ if __name__ == "__main__":
             [x for x in sorted_current_state_words if x[0] == max_lenght]
         )
         next_word = choice(next_word_list[1])
+
         for letter, position in zip(next_word, next_word_list[2]):
             add_letter(ARRAY, letter, position[0], position[1])
         console.print(f"\nNew word: [blue]{next_word}[/blue] {next_word_list[2]}")
