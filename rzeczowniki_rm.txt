@@ -2160,7 +2160,6 @@ carewicz
 carobójca
 carz
 casanova
-catch
 ceber
 cebr
 cebrzyk
@@ -2896,6 +2895,7 @@ darwinizm
 darybok
 dąsik
 daszek
+data
 datek
 dauhańczyk
 dauhańczyk
@@ -6240,6 +6240,7 @@ katowiczanin
 katus
 kauczuk
 kauczukowiec
+kawa
 kawak
 kawał
 kawalątek
@@ -7678,6 +7679,7 @@ laufer
 laur
 laureat
 ławnik
+lawa
 lawor
 lawór
 lawrens
@@ -7938,6 +7940,7 @@ loft
 log
 logarytm
 logik
+logo
 logogram
 logopeda
 logotyp
@@ -10120,6 +10123,7 @@ pakiet
 pakt
 pakunek
 pal
+pała
 pałac
 palący
 pałacyk
@@ -12553,6 +12557,7 @@ rumpel
 rumsztyk
 rumuński
 rupieć
+rura
 rurał
 rurała
 rurarz
