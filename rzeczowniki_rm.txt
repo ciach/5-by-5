@@ -4521,7 +4521,6 @@ frazem
 frazeologizm
 frazes
 frazesik
-freak
 frednowianin
 fredropolanin
 frędzel
@@ -8879,7 +8878,6 @@ morszczyn
 mortus
 mortusiak
 morus
-morus
 morzyk
 mosiądz
 mosiek
@@ -10428,7 +10426,6 @@ patison
 pątnik
 patocelebryta
 patolog
-patostreamer
 patriarcha
 patriarchat
 patriota
@@ -16882,3 +16879,9 @@ zysk
 żyżmóń
 żyznowianin
 żyżyń
+weto
+patos
+saga
+cło
+kutas
+prusak
