@@ -14,6 +14,7 @@ from rich.console import Console
 from rich import print as rich_print
 from rich.columns import Columns
 from rich.panel import Panel
+from rich.progress import track
 from core_func import my_bad_function
 from cells_func import (
     cell_inside,
@@ -90,28 +91,32 @@ if __name__ == "__main__":
     logging.debug("first word: %s", START_WORD.strip())
     # console.print(f"words_played: [blue]{words_played[0]}[/blue]")
     show_array(ARRAY)
-
+    console.print()
     while True:
         # user starts to play
-        user_word = input("Enter word (to pass press ENTER):")
+        user_word = input("Enter word (to pass press ENTER): ")
         if check_user_word(
-            user_word, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"
+            user_word, words_played, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"
         ):
             console.print("Word is correct!")
             user_path_str = input("Enter path in format x1,y1, x2,y2, ..., xn,yn: ")
-            fs = user_path_str.split(" ")
+            fs = user_path_str.split(", ")
             user_path = [tuple(map(int, i.split(","))) for i in fs]
             if check_user_path(user_path, ARRAY, "#"):
                 console.print("Word path is correct!")
                 console.print(
                     f"Your word is: [blue]{user_word}[/blue] and path is: [blue]{user_path}[/blue]"
                 )
+                logging.debug("user word: %s", user_word)
+                logging.debug("user path: %s", user_path)
                 for letter, position in zip(user_word, user_path):
-                    print(letter, position)
+                    console.print(f"{letter}: {position}")
                     add_letter(ARRAY, letter, position[0], position[1])
                 words_played.append(user_word)
+                console.print()
                 show_array(ARRAY)
-
+        else:
+            logging.debug("no user word")
         # computer starts to play
         start = perf_counter()
         e = my_bad_function(ARRAY, cells_to_play(ARRAY, "#"))
@@ -126,18 +131,27 @@ if __name__ == "__main__":
         # here we'll store all words that can be played in current stage
         # but not the ones that are already played
         # TODO: there is no exit condition if no words are found
-        current_state_words = get_possible_words(
-            3, 7, f, words_played, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"
-        )
-        if not current_state_words:
-            logging.debug("No words found in range 3-7, trying 1-4")
+
+        # use rich progress bar to show progress of function
+        console.print()
+        with console.status("[bold green]Finding possible words...") as status:
             current_state_words = get_possible_words(
-                1,
-                4,
+                3,
+                7,
                 f,
                 words_played,
                 "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt",
             )
+        if not current_state_words:
+            logging.debug("No words found in range 3-7, trying 1-4")
+            with console.status("[bold green]Finding more possible words...") as status:
+                current_state_words = get_possible_words(
+                    1,
+                    4,
+                    f,
+                    words_played,
+                    "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt",
+                )
 
         sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
         # print(len(sorted_current_state_words))
@@ -155,9 +169,9 @@ if __name__ == "__main__":
         words_played.append(next_word)
         console.print(f"Words played: {words_played}.")
         end = perf_counter()
-        console.print(f"It took me: {end - start:.2f} seconds to find next_word.\n")
+        console.print(f"It took me: {end - start:.2f} seconds to find {next_word}.\n")
         logging.debug("It took me, %s seconds to find: %s.", end - start, next_word)
-        # users = [words_played]
         user_renderables = [Panel(user, expand=True) for user in words_played]
         console.print(Columns(user_renderables))
         show_array(ARRAY)
+        console.print()

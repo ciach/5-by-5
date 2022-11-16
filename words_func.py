@@ -77,7 +77,7 @@ def find_word(word_, words_dict_path) -> list:
     return words_list
 
 
-def check_user_word(user_word_: str, words_dict_path) -> bool:
+def check_user_word(user_word_: str, words_played_: list, words_dict_path) -> bool:
     """_summary_
 
     Args:
@@ -86,7 +86,7 @@ def check_user_word(user_word_: str, words_dict_path) -> bool:
     Returns:
         bool: _description_
     """
-    if user_word_:
+    if user_word_ and user_word_ not in words_played_:
         # check if the word is in the file
         with open(Path(words_dict_path), "r", encoding="UTF-8") as file:
             for line in file:
