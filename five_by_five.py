@@ -99,7 +99,7 @@ if __name__ == "__main__":
             user_word, words_played, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"
         ):
             console.print("Word is correct!")
-            user_path_str = input("Enter path in format x1,y1, x2,y2, ..., xn,yn: ")
+            user_path_str = input("Enter path in format y1,x1, y2,x2, ..., yn,xn: ")
             fs = user_path_str.split(", ")
             user_path = [tuple(map(int, i.split(","))) for i in fs]
             if check_user_path(user_path, ARRAY, "#"):
