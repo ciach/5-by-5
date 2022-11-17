@@ -5,6 +5,10 @@
 
     Returns:
         _type_: _description_
+
+    TODO: we should load all the words from dictionary into memory / list
+    TODO: words longer than X letters should be ignored, X value TBD (11?)
+    TODO: figure out the user input method for path (only one letter?) or a GUI/TUI?
     """
 from time import perf_counter
 import os
@@ -130,8 +134,6 @@ if __name__ == "__main__":
 
         # here we'll store all words that can be played in current stage
         # but not the ones that are already played
-        # TODO: there is no exit condition if no words are found
-
         # use rich progress bar to show progress of function
         console.print()
         with console.status("[bold green]Finding possible words...") as status:
