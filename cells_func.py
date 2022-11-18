@@ -27,11 +27,11 @@ def show_array(my_array):
     #    rich_print(row)
     table = Table(show_header=False, header_style="none", box=box.MINIMAL_DOUBLE_HEAD)
     # add columns
-    table.add_column("Column 1", style="cyan")
-    table.add_column("Column 2", style="magenta")
-    table.add_column("Column 3", style="green")
-    table.add_column("Column 4", style="white")
-    table.add_column("Column 5", style="red")
+    table.add_column("Column 1", style="bright_white")
+    table.add_column("Column 2", style="bright_white")
+    table.add_column("Column 3", style="bright_white")
+    table.add_column("Column 4", style="bright_white")
+    table.add_column("Column 5", style="bright_white")
     # add rows
     for row in my_array:
         table.add_row(*row)
