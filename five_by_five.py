@@ -116,7 +116,6 @@ if __name__ == "__main__":
                 logging.debug("user letter: %s", user_letter)
                 logging.debug("user path: %s", user_path)
                 console.print(f"{user_word}: {user_letter}: {user_path}")
-                console.print(type(user_path))
                 add_letter(ARRAY, user_letter, int(user_path[0]), int(user_path[1]))
                 words_played.append(user_word)
                 console.print()
