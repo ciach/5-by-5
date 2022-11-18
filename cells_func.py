@@ -1,7 +1,9 @@
 """CELLS FUNCTIONS"""
 from itertools import product
 from numpy import chararray
-from rich import print as rich_print
+from rich.console import Console
+from rich.table import Table
+from rich import box
 
 
 def create_array(rows: int, cols: int, empty_char: str):
@@ -21,8 +23,21 @@ def create_array(rows: int, cols: int, empty_char: str):
 
 def show_array(my_array):
     """Prints the array in the console"""
+    # for row in my_array:
+    #    rich_print(row)
+    table = Table(show_header=False, header_style="none", box=box.MINIMAL_DOUBLE_HEAD)
+    # add columns
+    table.add_column("Column 1", style="cyan")
+    table.add_column("Column 2", style="magenta")
+    table.add_column("Column 3", style="green")
+    table.add_column("Column 4", style="white")
+    table.add_column("Column 5", style="red")
+    # add rows
     for row in my_array:
-        rich_print(row)
+        table.add_row(*row)
+    # print table
+    console = Console()
+    console.print(table)
 
 
 def cell_inside(cell: tuple) -> bool:
