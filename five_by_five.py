@@ -8,17 +8,17 @@
 
     TODO: we should load all the words from dictionary into memory / list
     TODO: words longer than X letters should be ignored, X value TBD (11?)
-    TODO: figure out the user input method for path (only one letter?) or a GUI/TUI?
+    TODO: figure out the better user input method for path. GUI/TUI?
+    TODO: load words from file into memory (list) or two lists:
+     one for short words one for longer ones
     """
 from time import perf_counter
 import os
 import logging
 from random import choice
 from rich.console import Console
-from rich import print as rich_print
 from rich.columns import Columns
 from rich.panel import Panel
-from rich.progress import track
 from core_func import my_bad_function
 from cells_func import (
     cell_inside,
@@ -108,10 +108,9 @@ if __name__ == "__main__":
             user_path = user_path_str.split(",")
             if check_user_path(user_path, ARRAY, "#"):
                 console.print("Letter position is correct!")
-                console.print(
-                    f"Your word is: [blue]{user_word}[/blue], your new letter is: {user_letter}\
-                        and position is: [blue]{user_path}[/blue]"
-                )
+                console.print(f"Your word is: [blue]{user_word}[/blue],")
+                console.print(f"your new letter is: {user_letter}")
+                console.print(f"position is: [blue]{user_path}[/blue]")
                 logging.debug("user word: %s", user_word)
                 logging.debug("user letter: %s", user_letter)
                 logging.debug("user path: %s", user_path)
