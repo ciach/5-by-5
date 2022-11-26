@@ -8,6 +8,35 @@ from re import compile as re_compile
 from re import match
 
 
+def load_words(
+    words_dict_path: str, short_words_lenght: int, too_long_words_lenght: int
+) -> list:
+    """reads file with words and returns two lists of words
+    one with words shorter than short_words_lenght
+    and one with words longer than too_long_words_lenght
+
+    Args:
+        words_dict_path (str): path to the file with words
+        short_words_lenght (int): words shorter than this will be returned
+        too_long_words_lenght (int): words longer than this will be returned
+
+    Returns:
+        list: list of two lists, first with short words, second with long words
+    """
+
+    words_list_short = []
+    words_list_long = []
+    with open(Path(words_dict_path), "r", encoding="UTF-8") as file:
+        for line in file:
+            line = line.rstrip()
+            if short_words_lenght > len(line):
+                words_list_short.append(line)
+            elif short_words_lenght <= len(line) < too_long_words_lenght:
+                words_list_long.append(line)
+    file.close()
+    return [words_list_short, words_list_long]
+
+
 def set_first_word(my_array, rows, cols, word_, orientation="horizontal"):
     """Sets the first word in the array"""
     word_ = word_.upper()
