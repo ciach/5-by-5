@@ -77,29 +77,23 @@ def start_word(lenght: int, words_list: list) -> str:
     return choice(list(filter(lambda x: len(x) == lenght, words_list)))
 
 
-def find_word(word_, words_dict_path) -> list:
+def find_word(word_: str, words_list) -> list:
     """Finds the words matching the given criteria in the "word" variable
     by looking into the wordsDictPath
 
     Args:
         word (str): _description_
-        wordsDictPath (str): _description_
+        words_list (list): _description_
 
     Returns:
         list: with word matching critiria from "word" variable
     """
     word_ = word_.replace("#", ".").lower()
-
-    # rich_print(f"{word}")
     reg = re_compile(word_)
-    words_list = []
-    with open(Path(words_dict_path), "r", encoding="UTF-8") as file:
-        for line in file:
-            line = line.rstrip()
-            if bool(match(reg, line)) and (len(line) == len(word_)):
-                words_list.append(line)
-    file.close()
-    return words_list
+
+    return list(
+        filter(lambda x: bool(match(reg, x)) and (len(x) == len(word_)), words_list)
+    )
 
 
 def check_user_word(user_word_: str, words_played_: list, words_dict_path) -> bool:
