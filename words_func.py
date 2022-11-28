@@ -34,7 +34,7 @@ def load_words(
             elif short_words_lenght <= len(line) < too_long_words_lenght:
                 words_list_long.append(line)
     file.close()
-    return [words_list_short, words_list_long]
+    return words_list_short, words_list_long
 
 
 def set_first_word(my_array, rows, cols, word_, orientation="horizontal"):
@@ -64,21 +64,17 @@ def add_letter(my_array: list, letter_: str, pos_x: int, pos_y: int):
     return my_array
 
 
-def start_word(lenght, words_dict_path) -> str:
-    """get random word from words dictionary of given lenght
-        example: print(start_word(5, "/home/cielak/Nauka/fivebyfive/sjp-20220605/slowa.txt"))
+def start_word(lenght: int, words_list: list) -> str:
+    """get random word from words list of given lenght
+        example: print(start_word(5, words_list))
     Args:
         lenght (int): desired word lenght
-        wordsDictPath (str): path to the file
+        wordsList (str): path to the file
 
     Returns:
         str: random word of given lenght from dictionary
     """
-    words_list = []
-    with open(Path(words_dict_path), "r", encoding="UTF-8") as file:
-        words_list.extend(line for line in file if len(line) == lenght + 1)
-    file.close()
-    return choice(words_list)
+    return choice(list(filter(lambda x: len(x) == lenght, words_list)))
 
 
 def find_word(word_, words_dict_path) -> list:
