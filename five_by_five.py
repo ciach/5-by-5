@@ -9,6 +9,7 @@
     TODO: we should load all the words from dictionary into memory / list
     TODO: words longer than X letters should be ignored, X value TBD (11?)
     TODO: figure out the user input method for path (only one letter?) or a GUI/TUI?
+    TODO: add two buttons press to show last word played
     """
 from time import perf_counter
 import os
