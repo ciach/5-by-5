@@ -77,7 +77,7 @@ def start_word(lenght: int, words_list: list) -> str:
     return choice(list(filter(lambda x: len(x) == lenght, words_list)))
 
 
-def find_word(word_: str, words_list) -> list:
+def find_word(word_: str, words_list: list) -> list:
     """Finds the words matching the given criteria in the "word" variable
     by looking into the wordsDictPath
 

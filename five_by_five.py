@@ -15,6 +15,7 @@ from time import perf_counter
 import os
 import logging
 from random import choice
+from math import pow
 from rich.console import Console
 from rich import print as rich_print
 from rich.columns import Columns
@@ -35,6 +36,7 @@ from words_func import (
     add_letter,
     check_user_word,
     find_word,
+    load_words,
     start_word,
     set_first_word,
 )
@@ -61,11 +63,9 @@ def cls():
 
 
 def get_possible_words(
-    bigger_than: int,
-    smaller_than: int,
     my_dict: dict,
     my_words_played: list,
-    words_file: str,
+    words_list: list,
 ) -> list:
     """
     here we'll store all words that can be played in current stage
@@ -74,14 +74,11 @@ def get_possible_words(
     current_state_words_ = []
 
     for key_, path_ in my_dict.items():
-        if len(key_) > bigger_than and len(key_) < smaller_than:
-            answer_ = find_word(key_, words_file)
-            if len(answer_) > 0:
-                if mod_answer_ := [
-                    word for word in answer_ if word not in my_words_played
-                ]:
-                    current_state_words_.append([len(answer_[0]), mod_answer_, path_])
-                    logging.debug("current_state_words, %s", current_state_words_)
+        answer_ = find_word(key_, words_list)
+        if len(answer_) > 0:
+            if mod_answer_ := [word for word in answer_ if word not in my_words_played]:
+                current_state_words_.append([len(answer_[0]), mod_answer_, path_])
+                logging.debug("current_state_words, %s", current_state_words_)
 
     return current_state_words_
 
@@ -89,8 +86,11 @@ def get_possible_words(
 if __name__ == "__main__":
     console = Console()
     cls()
+    short_words, long_words = load_words(
+        "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt", 4, 8
+    )
     ARRAY = create_array(ROWS, COLS, "#")
-    START_WORD = start_word(ROWS, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt")
+    START_WORD = start_word(ROWS, long_words)
     set_first_word(ARRAY, 5, 5, START_WORD)
     words_played = [START_WORD.strip()]
     logging.debug("first word: %s", START_WORD.strip())
@@ -100,8 +100,8 @@ if __name__ == "__main__":
     while True:
         # user starts to play
         user_word = input("Enter word (to pass press ENTER): ")
-        if check_user_word(
-            user_word, words_played, "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt"
+        if check_user_word(user_word, words_played, long_words) or check_user_word(
+            user_word, words_played, short_words
         ):
             console.print("Word is correct!")
             user_path_str = input("Enter path in format y1,x1, y2,x2, ..., yn,xn: ")
@@ -138,23 +138,11 @@ if __name__ == "__main__":
         # use rich progress bar to show progress of function
         console.print()
         with console.status("[bold green]Finding possible words...") as status:
-            current_state_words = get_possible_words(
-                3,
-                7,
-                f,
-                words_played,
-                "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt",
-            )
+            current_state_words = get_possible_words(f, words_played, long_words)
         if not current_state_words:
             logging.debug("No words found in range 3-7, trying 1-4")
             with console.status("[bold green]Finding more possible words...") as status:
-                current_state_words = get_possible_words(
-                    1,
-                    4,
-                    f,
-                    words_played,
-                    "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt",
-                )
+                current_state_words = get_possible_words(f, words_played, short_words)
 
         sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
         # print(len(sorted_current_state_words))
@@ -174,7 +162,10 @@ if __name__ == "__main__":
         end = perf_counter()
         console.print(f"It took me: {end - start:.2f} seconds to find {next_word}.\n")
         logging.debug("It took me, %s seconds to find: %s.", end - start, next_word)
-        user_renderables = [Panel(user, expand=True) for user in words_played]
-        console.print(Columns(user_renderables))
+        words_played_list = [
+            Panel(word + " - " + str(pow(len(word), 2)), expand=True)
+            for word in words_played
+        ]
+        console.print(Columns(words_played_list))
         show_array(ARRAY)
         console.print()
