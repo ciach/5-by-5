@@ -83,6 +83,16 @@ def get_possible_words(
     return current_state_words_
 
 
+def score_display(words_played_: list, score: bool):
+    """Display score"""
+    if score:
+        return [
+            Panel(f"{word} - {str(pow(len(word), 2))}", expand=True)
+            for word in words_played_
+        ]
+    return [Panel(f"{word}", expand=True) for word in words_played_]
+
+
 if __name__ == "__main__":
     console = Console()
     cls()
@@ -93,6 +103,8 @@ if __name__ == "__main__":
     START_WORD = start_word(ROWS, long_words)
     set_first_word(ARRAY, 5, 5, START_WORD)
     words_played = [START_WORD.strip()]
+    words_played_player_one = []
+    words_played_player_two = []
     logging.debug("first word: %s", START_WORD.strip())
     # console.print(f"words_played: [blue]{words_played[0]}[/blue]")
     show_array(ARRAY)
@@ -118,6 +130,7 @@ if __name__ == "__main__":
                     console.print(f"{letter}: {position}")
                     add_letter(ARRAY, letter, position[0], position[1])
                 words_played.append(user_word)
+                words_played_player_one.append(user_word)
                 console.print()
                 show_array(ARRAY)
         else:
@@ -158,14 +171,17 @@ if __name__ == "__main__":
             add_letter(ARRAY, letter, position[0], position[1])
         console.print(f"\nNew word: [blue]{next_word}[/blue] {next_word_list[2]}")
         words_played.append(next_word)
+        words_played_player_two.append(next_word)
         console.print(f"Words played: {words_played}.")
         end = perf_counter()
         console.print(f"It took me: {end - start:.2f} seconds to find {next_word}.\n")
         logging.debug("It took me, %s seconds to find: %s.", end - start, next_word)
-        words_played_list = [
-            Panel(word + " - " + str(pow(len(word), 2)), expand=True)
-            for word in words_played
-        ]
-        console.print(Columns(words_played_list))
+        console.print(Columns(score_display(words_played, False)))
+        console.print(
+            "Player One: ", Columns(score_display(words_played_player_one, True))
+        )
+        console.print(
+            "Player Two: ", Columns(score_display(words_played_player_two, True))
+        )
         show_array(ARRAY)
         console.print()
