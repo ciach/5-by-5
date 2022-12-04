@@ -169,7 +169,9 @@ if __name__ == "__main__":
 
         for letter, position in zip(next_word, next_word_list[2]):
             add_letter(ARRAY, letter, position[0], position[1])
-        console.print(f"\nNew word: [blue]{next_word}[/blue] {next_word_list[2]}")
+        console.print(
+            f"\nNew word: [dark_olive_green2]{next_word}[/dark_olive_green2] {next_word_list[2]}"
+        )
         words_played.append(next_word)
         words_played_player_two.append(next_word)
         console.print(f"Words played: {words_played}.")
