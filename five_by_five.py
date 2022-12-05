@@ -83,7 +83,7 @@ def get_possible_words(
     return current_state_words_
 
 
-def score_display(words_played_: list, score: bool):
+def words_display(words_played_: list, score: bool = False) -> None:
     """Display score"""
     if score:
         return [
@@ -91,6 +91,11 @@ def score_display(words_played_: list, score: bool):
             for word in words_played_
         ]
     return [Panel(f"{word}", expand=True) for word in words_played_]
+
+
+def score_display(words_played_: list) -> None:
+    """Display score"""
+    return int(sum(pow(len(word), 2) for word in words_played_))
 
 
 if __name__ == "__main__":
@@ -178,12 +183,10 @@ if __name__ == "__main__":
         end = perf_counter()
         console.print(f"It took me: {end - start:.2f} seconds to find {next_word}.\n")
         logging.debug("It took me, %s seconds to find: %s.", end - start, next_word)
-        console.print(Columns(score_display(words_played, False)))
-        console.print(
-            "Player One: ", Columns(score_display(words_played_player_one, True))
-        )
-        console.print(
-            "Player Two: ", Columns(score_display(words_played_player_two, True))
-        )
+        console.print(Columns(words_display(words_played)))
+        console.print(f"Player One: {score_display(words_played_player_one)}")
+        console.print(f"Player Two: {score_display(words_played_player_two)}")
         show_array(ARRAY)
         console.print()
+
+# q: how to merge main branch to my branch?
