@@ -101,9 +101,7 @@ def score_display(words_played_: list) -> None:
 if __name__ == "__main__":
     console = Console()
     cls()
-    short_words, long_words = load_words(
-        "/home/cielak/Nauka/fivebyfive/rzeczowniki_rm.txt", 4, 8
-    )
+    short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 8)
     ARRAY = create_array(ROWS, COLS, "#")
     START_WORD = start_word(ROWS, long_words)
     set_first_word(ARRAY, 5, 5, START_WORD)
@@ -121,19 +119,19 @@ if __name__ == "__main__":
             user_word, words_played, short_words
         ):
             console.print("Word is correct!")
-            user_path_str = input("Enter path in format y1,x1, y2,x2, ..., yn,xn: ")
-            fs = user_path_str.split(", ")
-            user_path = [tuple(map(int, i.split(","))) for i in fs]
+            user_letter = input("Enter new letter: ")
+            user_path_str = input("New letter position in format y,x: ")
+            user_path = user_path_str.split(",")
             if check_user_path(user_path, ARRAY, "#"):
-                console.print("Word path is correct!")
-                console.print(
-                    f"Your word is: [blue]{user_word}[/blue] and path is: [blue]{user_path}[/blue]"
-                )
+                console.print("Letter position is correct!")
+                console.print(f"Your word is: [blue]{user_word}[/blue],")
+                console.print(f"your new letter is: {user_letter}")
+                console.print(f"position is: [blue]{user_path}[/blue]")
                 logging.debug("user word: %s", user_word)
+                logging.debug("user letter: %s", user_letter)
                 logging.debug("user path: %s", user_path)
-                for letter, position in zip(user_word, user_path):
-                    console.print(f"{letter}: {position}")
-                    add_letter(ARRAY, letter, position[0], position[1])
+                console.print(f"{user_word}: {user_letter}: {user_path}")
+                add_letter(ARRAY, user_letter, int(user_path[0]), int(user_path[1]))
                 words_played.append(user_word)
                 words_played_player_one.append(user_word)
                 console.print()
