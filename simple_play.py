@@ -124,9 +124,9 @@ if __name__ == "__main__":
             user_path = user_path_str.split(",")
             if check_user_path(user_path, ARRAY, "#"):
                 console.print("Letter position is correct!")
-                console.print(f"Your word is: [light_blue]{user_word}[/light_blue],")
+                console.print(f"Your word is: [orchid1]{user_word}[/orchid1],")
                 console.print(f"your new letter is: {user_letter}")
-                console.print(f"position is: [light_blue]{user_path}[/light_blue]")
+                console.print(f"position is: [orchid1]{user_path}[/orchid1]")
                 logging.debug("user word: %s", user_word)
                 logging.debug("user letter: %s", user_letter)
                 logging.debug("user path: %s", user_path)
