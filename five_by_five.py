@@ -185,6 +185,8 @@ if __name__ == "__main__":
         logging.debug("It took me, %s seconds to find: %s.", end - start, next_word)
         console.print(Columns(words_display(words_played)))
         console.print(f"Player One: {score_display(words_played_player_one)}")
-        console.print(f"Player Two: {score_display(words_played_player_two)}")
+        console.print(
+            f"Player Two (Computer): {score_display(words_played_player_two)}"
+        )
         show_array(ARRAY)
         console.print()
