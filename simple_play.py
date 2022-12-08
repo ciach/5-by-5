@@ -61,6 +61,16 @@ def cls():
     """Clear screen"""
     os.system("cls" if os.name == "nt" else "clear")
 
+
+def get_possible_words(
+    my_dict: dict,
+    my_words_played: list,
+    words_list: list,
+) -> list:
+    """
+    here we'll store all words that can be played in current stage
+    but not the ones that are already played
+    """
     current_state_words_ = []
     time_limit = 60  # seconds
     start_time = time()
