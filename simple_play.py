@@ -11,7 +11,7 @@
     TODO: figure out the user input method for path (only one letter?) or a GUI/TUI?
     TODO: add two buttons press to show last word played
     """
-from time import perf_counter
+from time import perf_counter, time
 import os
 import logging
 from random import choice
@@ -61,24 +61,17 @@ def cls():
     """Clear screen"""
     os.system("cls" if os.name == "nt" else "clear")
 
-
-def get_possible_words(
-    my_dict: dict,
-    my_words_played: list,
-    words_list: list,
-) -> list:
-    """
-    here we'll store all words that can be played in current stage
-    but not the ones that are already played
-    """
     current_state_words_ = []
-
+    time_limit = 60  # seconds
+    start_time = time()
     for key_, path_ in my_dict.items():
         answer_ = find_word(key_, words_list)
         if len(answer_) > 0:
             if mod_answer_ := [word for word in answer_ if word not in my_words_played]:
                 current_state_words_.append([len(answer_[0]), mod_answer_, path_])
                 logging.debug("current_state_words, %s", current_state_words_)
+        if time() - start_time > time_limit:
+            break
 
     return current_state_words_
 
