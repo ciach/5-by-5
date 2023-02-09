@@ -96,6 +96,18 @@ def find_word(word_: str, words_list: list) -> list:
     )
 
 
+def check_user_letter(user_letter_: str) -> bool:
+    """Check if user input is a letter and has only one character
+
+    Args:
+        user_letter (str): user input
+
+    Returns:
+        bool: True if user input is a letter and has only one character
+    """
+    return bool(user_letter_ and user_letter_.isalpha() and len(user_letter_) == 1)
+
+
 def check_user_word(user_word_: str, words_played_: list, words_list: list) -> bool:
     """_summary_
 
