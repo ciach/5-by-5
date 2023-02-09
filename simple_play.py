@@ -104,7 +104,7 @@ def score_display(words_played_: list) -> None:
 if __name__ == "__main__":
     console = Console()
     cls()
-    short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 8)
+    short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 10)
     ARRAY = create_array(ROWS, COLS, "#")
     START_WORD = start_word(ROWS, long_words)
     set_first_word(ARRAY, 5, 5, START_WORD)
@@ -143,10 +143,10 @@ if __name__ == "__main__":
             logging.debug("no user word")
         # computer starts to play
         start = perf_counter()
-        console.print(ARRAY)
-        console.print(cells_to_play(ARRAY, "#"))
+        # console.print(ARRAY)
+        # console.print(cells_to_play(ARRAY, "#"))
         e = my_bad_function(ARRAY, cells_to_play(ARRAY, "#"))
-        console.print(e)
+        # console.print(e)
         # print(e, len(e), type(e))  # we have list with possible paths
         # inform if no path found
         if len(e) == 0:
@@ -194,3 +194,5 @@ if __name__ == "__main__":
         )
         show_array(ARRAY)
         console.print()
+    console.print(f"Player One: {score_display(words_played_player_one)}")
+    console.print(f"Player Two (computer): {score_display(words_played_player_two)}")
