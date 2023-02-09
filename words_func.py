@@ -86,7 +86,7 @@ def find_word(word_: str, words_list: list) -> list:
         words_list (list): _description_
 
     Returns:
-        list: with word matching critiria from "word" variable
+        list: with word matching criteria from "word" variable
     """
     word_ = word_.replace("#", ".").lower()
     reg = re_compile(word_)
