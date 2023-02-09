@@ -105,8 +105,6 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
     Returns:
         bool: _description_
     """
-    if user_word_ and user_word_ not in words_played_:
-        # check if the word is in the words list
-        if user_word_ in words_list:
-            return True
-    return False
+    return bool(
+        user_word_ and user_word_ not in words_played_ and user_word_ in words_list
+    )
