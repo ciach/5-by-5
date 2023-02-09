@@ -183,7 +183,7 @@ if __name__ == "__main__":
         )
         words_played.append(next_word)
         words_played_player_two.append(next_word)
-        console.print(f"Words played: {words_played}.")
+        # console.print(f"Words played: {words_played}.")
         end = perf_counter()
         console.print(f"It took me: {end - start:.2f} seconds to find {next_word}.\n")
         logging.debug("It took me, %s seconds to find: %s.", end - start, next_word)
