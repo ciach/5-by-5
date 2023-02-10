@@ -34,6 +34,7 @@ from cells_func import (
 )
 from words_func import (
     add_letter,
+    check_user_letter,
     check_user_word,
     find_word,
     load_words,
@@ -123,22 +124,28 @@ if __name__ == "__main__":
         ):
             console.print("Word is correct!")
             user_letter = input("Enter new letter: ")
-            user_path_str = input("New letter position in format y,x: ")
-            user_path = user_path_str.split(",")
-            if check_user_path(user_path, ARRAY, "#"):
-                console.print("Letter position is correct!")
-                console.print(f"Your word is: [orchid1]{user_word}[/orchid1],")
-                console.print(f"your new letter is: {user_letter}")
-                console.print(f"position is: [orchid1]{user_path}[/orchid1]")
-                logging.debug("user word: %s", user_word)
-                logging.debug("user letter: %s", user_letter)
-                logging.debug("user path: %s", user_path)
-                console.print(f"{user_word}: {user_letter}: {user_path}")
-                add_letter(ARRAY, user_letter, int(user_path[0]), int(user_path[1]))
-                words_played.append(user_word)
-                words_played_player_one.append(user_word)
-                console.print()
-                show_array(ARRAY)
+            if check_user_letter(user_letter):
+                user_path_str = input("New letter position in format y,x: ")
+                user_path = user_path_str.split(",")
+                if check_user_path(user_path, ARRAY, "#"):
+                    console.print("Letter position is correct!")
+                    console.print(f"Your word is: [orchid1]{user_word}[/orchid1],")
+                    console.print(f"your new letter is: {user_letter}")
+                    console.print(f"position is: [orchid1]{user_path}[/orchid1]")
+                    logging.debug("user word: %s", user_word)
+                    logging.debug("user letter: %s", user_letter)
+                    logging.debug("user path: %s", user_path)
+                    # console.print(f"{user_word}: {user_letter}: {user_path}")
+                    add_letter(ARRAY, user_letter, int(user_path[0]), int(user_path[1]))
+                    words_played.append(user_word)
+                    words_played_player_one.append(user_word)
+                    console.print()
+                    show_array(ARRAY)
+            else:
+                console.print(
+                    "Letter is incorrect! Should be one letter! Not a number!"
+                )
+                console.print("Computer will play!")
         else:
             logging.debug("no user word")
         # computer starts to play
