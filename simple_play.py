@@ -15,22 +15,16 @@ from time import perf_counter, time
 import os
 import logging
 from random import choice
-from math import pow
 from rich.console import Console
-from rich import print as rich_print
 from rich.columns import Columns
 from rich.panel import Panel
-from rich.progress import track
 from core_func import my_bad_function
 from cells_func import (
-    cell_inside,
-    cell_neighbors,
     cells_to_play,
     check_user_path,
     create_array,
     possible_words_list,
     show_array,
-    step,
 )
 from words_func import (
     add_letter,
@@ -205,10 +199,10 @@ if __name__ == "__main__":
     console.print(f"Player One: {score_display(words_played_player_one)}")
     console.print(f"Player Two (computer): {score_display(words_played_player_two)}")
     if score_display(words_played_player_one) > score_display(words_played_player_two):
-        console.print(f"Player One wins!")
+        console.print("Player One wins!", style="blink")
     elif score_display(words_played_player_one) < score_display(
         words_played_player_two
     ):
-        console.print(f"Player Two (computer) wins!")
+        console.print("Player Two (computer) wins!")
     else:
-        console.print(f"Draw!")
+        console.print("Draw!")
