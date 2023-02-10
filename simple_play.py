@@ -201,5 +201,14 @@ if __name__ == "__main__":
         )
         show_array(ARRAY)
         console.print()
+
     console.print(f"Player One: {score_display(words_played_player_one)}")
     console.print(f"Player Two (computer): {score_display(words_played_player_two)}")
+    if score_display(words_played_player_one) > score_display(words_played_player_two):
+        console.print(f"Player One wins!")
+    elif score_display(words_played_player_one) < score_display(
+        words_played_player_two
+    ):
+        console.print(f"Player Two (computer) wins!")
+    else:
+        console.print(f"Draw!")
