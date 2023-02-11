@@ -199,7 +199,7 @@ if __name__ == "__main__":
     console.print(f"Player One: {score_display(words_played_player_one)}")
     console.print(f"Player Two (computer): {score_display(words_played_player_two)}")
     if score_display(words_played_player_one) > score_display(words_played_player_two):
-        console.print("Player One wins!", style="blink")
+        console.print("PLAYER ONE WINS!", style="blink")
     elif score_display(words_played_player_one) < score_display(
         words_played_player_two
     ):
