@@ -93,11 +93,20 @@ def cell_neighbors(
     return possible_cells
 
 
-def step(cell: tuple, my_array: list, empty_char: str) -> list:
-    """Receives a cell and returns a list with the cells that can be played"""
-    steps_all = cell_neighbors(cell, my_array, empty_char)
+def step(
+    cell: Tuple[int, int], my_array: List[List[str]], empty_char: str
+) -> List[Tuple[int, int]]:
+    """Returns a list of neighboring cells that can be played for the given cell in the 2D array.
 
-    return list(steps_all)
+    Args:
+        cell (Tuple[int, int]): A tuple containing the X and Y positions of the cell (cellx, celly).
+        my_array (List[List[str]]): A 2D array representing the grid.
+        empty_char (str): The character representing an empty cell in the array.
+
+    Returns:
+        List[Tuple[int, int]]: A list of neighboring cells as (x, y) tuples that can be played.
+    """
+    return cell_neighbors(cell, my_array, empty_char)
 
 
 def possible_words_list(paths_list: list, my_array: list) -> dict:
