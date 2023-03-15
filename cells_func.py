@@ -1,10 +1,10 @@
 """CELLS FUNCTIONS"""
 from itertools import product
+from typing import List, Tuple, Dict
 from numpy import chararray
 from rich.console import Console
 from rich.table import Table
 from rich.box import MINIMAL_DOUBLE_HEAD
-from typing import List, Tuple
 
 
 def create_array(rows: int, cols: int, empty_char: str) -> chararray:
@@ -109,28 +109,47 @@ def step(
     return cell_neighbors(cell, my_array, empty_char)
 
 
-def possible_words_list(paths_list: list, my_array: list) -> dict:
-    """_summary_
+def possible_words_list(
+    paths_list: List[List[Tuple[int, int]]], my_array: List[List[str]]
+) -> Dict[str, List[Tuple[int, int]]]:
+    """Generates a dictionary of possible words from a list of paths in a 2D array.
 
     Args:
-        paths_list (list): list of lists containing posible paths indicated
-        by cell position. Eg: [[(1,0), (2,0)], [(1,0), (2,0), (3, 0)]
+        paths_list (List[List[Tuple[int, int]]]): A list of paths represented as
+        lists of cell positions.
+            E.g., [[(1, 0), (2, 0)], [(1, 0), (2, 0), (3, 0)]]
+        my_array (List[List[str]]): A 2D array representing the grid.
 
     Returns:
-        dict: possible word as key and path as item. Eg.: {'#A': [(1, 0), (2, 0)]}
+        Dict[str, List[Tuple[int, int]]]: A dictionary with possible words as
+        keys and paths as values.
+            E.g., {'#A': [(1, 0), (2, 0)]}
     """
     possible_words = {}
-    for path_ in paths_list:
-        word_ = [my_array[item] for item in path_]
-        if word_.count("#") == 1:  # should have only one free space
-            possible_words["".join(word_)] = path_
+    for path in paths_list:
+        word = [my_array[item] for item in path]
+        if word.count("#") == 1:  # should have only one free space
+            possible_words["".join(word)] = path
     return possible_words
 
 
-def cells_to_play(my_array: list, empty_char: str) -> dict:
-    """for every cell in the array with a letter, returns a list of cells that can be played"""
+def cells_to_play(
+    my_array: List[List[str]], empty_char: str
+) -> Dict[Tuple[int, int], List[Tuple[int, int]]]:
+    """
+    For every cell in the array with a letter, returns a dictionary where the keys are cell coordinates
+    and the values are lists of neighboring cells that can be played.
 
-    cells = list(product(range(5), range(5)))
+    Args:
+        my_array (List[List[str]]): The array with letters and empty spaces.
+        empty_char (str): The character representing an empty space in the array.
+
+    Returns:
+        Dict[Tuple[int, int], List[Tuple[int, int]]]: A dictionary with cell coordinates as keys and
+                                                      lists of playable neighboring cells as values.
+    """
+    rows, cols = len(my_array), len(my_array[0])
+    cells = list(product(range(rows), range(cols)))
     return {
         cell: step(cell, my_array, empty_char)
         for cell in cells
