@@ -6,15 +6,16 @@ from rich.table import Table
 from rich import box
 
 
-def create_array(rows: int, cols: int, empty_char: str):
-    """_summary_
+def create_array(rows: int, cols: int, empty_char: str) -> chararray:
+    """Create a 2D numpy chararray with the given dimensions and fill it with a specified character.
 
     Args:
-        rows (_type_): _description_
-        cols (_type_): _description_
+        rows (int): The number of rows in the array.
+        cols (int): The number of columns in the array.
+        empty_char (str): The character to fill the array with.
 
     Returns:
-        _type_: _description_
+        chararray: A 2D numpy chararray filled with the specified character.
     """
     char_array = chararray((rows, cols), unicode=True)
     char_array[:] = empty_char
@@ -123,7 +124,7 @@ def possible_words_list(paths_list: list, my_array: list) -> dict:
 
 
 def cells_to_play(my_array: list, empty_char: str) -> dict:
-    """_summary_"""
+    """for every cell in the array with a letter, returns a list of cells that can be played"""
 
     cells = list(product(range(5), range(5)))
     return {
