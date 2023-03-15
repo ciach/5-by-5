@@ -47,23 +47,22 @@ def show_array(my_array, console: Console = None):
     console.print(table)
 
 
-def cell_inside(cell: tuple) -> bool:
+def cell_inside(cell: tuple, rows_: int = 5, cols_: int = 5) -> bool:
     """
-    Checks if the cell is inside the ARRAYay based on the X, Y position
+    Checks if the cell is inside the array based on the X, Y position.
 
     Args:
-        cellx (int): cell X position
-        celly (int): cell Y position
+        cell (tuple): A tuple containing the X and Y positions of the cell (cellx, celly).
+        rows_ (int, optional): The number of rows in the array. Defaults to 5.
+        cols_ (int, optional): The number of columns in the array. Defaults to 5.
 
     Returns:
-        Bool: if the cell is inside the ARRAYay
+        bool: True if the cell is inside the array, False otherwise.
     """
-    rows_ = 5
-    cols_ = 5
-    cellx, celly = cell[0], cell[1]
+    cellx, celly = cell
     x_pos = 0 <= cellx < rows_
     y_pos = 0 <= celly < cols_
-    return (x_pos, y_pos) == (True, True)
+    return x_pos and y_pos
 
 
 def cell_neighbors(cell: tuple, my_array: list, empty_char: str) -> list:
