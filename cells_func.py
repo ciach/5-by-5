@@ -3,7 +3,7 @@ from itertools import product
 from numpy import chararray
 from rich.console import Console
 from rich.table import Table
-from rich import box
+from rich.box import MINIMAL_DOUBLE_HEAD
 
 
 def create_array(rows: int, cols: int, empty_char: str) -> chararray:
@@ -22,22 +22,28 @@ def create_array(rows: int, cols: int, empty_char: str) -> chararray:
     return char_array
 
 
-def show_array(my_array):
-    """Prints the array in the console"""
-    # for row in my_array:
-    #    rich_print(row)
-    table = Table(show_header=False, header_style="none", box=box.MINIMAL_DOUBLE_HEAD)
-    # add columns
-    table.add_column("Column 1", style="white")
-    table.add_column("Column 2", style="white")
-    table.add_column("Column 3", style="white")
-    table.add_column("Column 4", style="white")
-    table.add_column("Column 5", style="white")
-    # add rows
+def show_array(my_array, console: Console = None):
+    """Prints the array in the console as a table.
+
+    Args:
+        my_array (List[List[str]]): A 2D array to be printed as a table.
+        console (Console, optional): A Console instance for output.
+                    Defaults to None, which creates a new Console instance.
+    """
+    if console is None:
+        console = Console()
+
+    table = Table(show_header=False, header_style="none", box=MINIMAL_DOUBLE_HEAD)
+
+    # Add columns
+    for i in range(len(my_array[0])):
+        table.add_column(f"Column {i + 1}", style="white")
+
+    # Add rows
     for row in my_array:
         table.add_row(*row)
-    # print table
-    console = Console()
+
+    # Print table
     console.print(table)
 
 
