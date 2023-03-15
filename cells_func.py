@@ -4,6 +4,7 @@ from numpy import chararray
 from rich.console import Console
 from rich.table import Table
 from rich.box import MINIMAL_DOUBLE_HEAD
+from typing import List, Tuple
 
 
 def create_array(rows: int, cols: int, empty_char: str) -> chararray:
@@ -65,40 +66,29 @@ def cell_inside(cell: tuple, rows_: int = 5, cols_: int = 5) -> bool:
     return x_pos and y_pos
 
 
-def cell_neighbors(cell: tuple, my_array: list, empty_char: str) -> list:
-    """Returns list with cells that are neighbours of the given cell"""
-    # cell under investigation
-    up_ = (cell[0] - 1, cell[1])
-    down = (cell[0] + 1, cell[1])
-    left = (cell[0], cell[1] - 1)
-    right = (cell[0], cell[1] + 1)
+def cell_neighbors(
+    cell: Tuple[int, int], my_array: List[List[str]], empty_char: str
+) -> List[Tuple[int, int]]:
+    """Returns a list of neighboring cells for the given cell in the 2D array.
+
+    Args:
+        cell (Tuple[int, int]): A tuple containing the X and Y positions of the cell (cellx, celly).
+        my_array (List[List[str]]): A 2D array representing the grid.
+        empty_char (str): The character representing an empty cell in the array.
+
+    Returns:
+        List[Tuple[int, int]]: A list of neighboring cells as (x, y) tuples.
+    """
+    directions = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     possible_cells = []
 
-    if my_array[cell] == empty_char:
-        if cell_inside(up_) and my_array[up_] != empty_char:
-            possible_cells.append(up_)
-
-        if cell_inside(down) and my_array[down] != empty_char:
-            possible_cells.append(down)
-
-        if cell_inside(left) and my_array[left] != empty_char:
-            possible_cells.append(left)
-
-        if cell_inside(right) and my_array[right] != empty_char:
-            possible_cells.append(right)
-
-    else:
-        if cell_inside(up_):
-            possible_cells.append(up_)
-
-        if cell_inside(down):
-            possible_cells.append(down)
-
-        if cell_inside(left):
-            possible_cells.append(left)
-
-        if cell_inside(right):
-            possible_cells.append(right)
+    for dx, dy in directions:
+        neighbor = (cell[0] + dx, cell[1] + dy)
+        if cell_inside(neighbor):
+            if my_array[cell] == empty_char and my_array[neighbor] != empty_char:
+                possible_cells.append(neighbor)
+            elif my_array[cell] != empty_char:
+                possible_cells.append(neighbor)
 
     return possible_cells
 
