@@ -128,7 +128,8 @@ def possible_words_list(
     possible_words = {}
     for path in paths_list:
         word = [my_array[item] for item in path]
-        if word.count("#") == 1:  # should have only one free space
+        # 'Free space' is represented by '#'. A valid word should have only one '#'.
+        if word.count("#") == 1:
             possible_words["".join(word)] = path
     return possible_words
 
