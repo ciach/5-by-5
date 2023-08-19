@@ -1,6 +1,6 @@
 import itertools
 import tkinter as tk
-from tkinter import ttk, simpledialog
+from tkinter import ttk, simpledialog, messagebox
 from time import time
 from random import choice
 
@@ -118,6 +118,9 @@ class WordGameGUI:
         self.initialize_game()
         self.update_valid_cells()
 
+        # Endgame scenario (comment out to test)
+        # self.setup_endgame_scenario()
+
     def initialize_game(self):
         """Initialize the game board and related variables."""
         self.my_array = create_array(5, 5, "#")
@@ -149,6 +152,13 @@ class WordGameGUI:
         valid_cells = cells_to_play(self.my_array, "#")
         for i, j in valid_cells:
             self.buttons[(i, j)].config(state=tk.NORMAL)
+
+        # Check if the game is over (e.g., only one cell left on the board)
+        empty_cells = sum(
+            self.my_array[i][j] == "#" for i, j in itertools.product(range(5), range(5))
+        )
+        if empty_cells == 0:
+            self.announce_winner()
 
     def update_scoreboard(self):
         """Update the scoreboard GUI with the current words and scores."""
@@ -191,7 +201,7 @@ class WordGameGUI:
         )
 
         if not current_state_words:
-            print("No words found in range 4-10, trying 1-4")
+            print("(INFO): No words found in range 4-10, trying 1-4")
             current_state_words = get_current_state_words(
                 words_dict, self.played_words, self.short_words
             )
@@ -274,6 +284,34 @@ class WordGameGUI:
         """
         # Show the letter entry dialog box
         self.show_letter_entry_dialog(i, j)
+
+    def announce_winner(self):
+        """_summary_"""
+        if self.player_score > self.cpu_score:
+            winner_message = "Congratulations! You won!"
+        elif self.player_score < self.cpu_score:
+            winner_message = "Sorry! The computer won. Better luck next time."
+        else:
+            winner_message = "It's a tie!"
+
+        # Show the message box with the winner announcement
+        messagebox.showinfo("Game Over", winner_message)
+        self.restart_game()
+
+    def setup_endgame_scenario(self):
+        """_summary_"""
+        for i, j in itertools.product(range(5), range(5)):
+            self.my_array[i][j] = "A"  # Set all cells to 'A'
+
+        # Leave the last cell empty to simulate one cell left
+        self.my_array[4][4] = "#"
+
+        # Step 3: Update the GUI
+        for i, j in itertools.product(range(5), range(5)):
+            self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
+
+        # Update the valid cells based on the new board state
+        self.update_valid_cells()
 
 
 root = tk.Tk()
