@@ -1,258 +1,269 @@
+import itertools
 import tkinter as tk
-from tkinter import simpledialog
-import tkinter.messagebox as messagebox
-import random
+from time import perf_counter, time
+from numpy import full, ndarray
+from random import choice, randint
+from tkinter import ttk, simpledialog, messagebox
 from core_func import my_bad_function
 from cells_func import (
     cells_to_play,
-    check_user_path,
     create_array,
     possible_words_list,
-    show_array,
 )
 from words_func import (
     add_letter,
-    check_user_letter,
     check_user_word,
-    find_word,
     load_words,
+    find_word,
     start_word,
     set_first_word,
 )
 
 
-short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 10)
-ARRAY = create_array(5, 5, "#")
+def get_current_state_words(
+    word_dict: dict,
+    words_played: list,
+    words_list: list,
+) -> list:
+    """
+    Retrieve all words that can be played in the current stage
+    and exclude the ones that are already played.
+    """
+    current_state_words = []
+    time_limit = 60  # seconds
+    start_time = time()
+    for key, path in word_dict.items():
+        answer = find_word(key, words_list)
+        if len(answer) > 0:
+            if modified_answer := [word for word in answer if word not in words_played]:
+                current_state_words.append([len(answer[0]), modified_answer, path])
+        if time() - start_time > time_limit:
+            break
+    return current_state_words
 
 
-class WordGame(tk.Tk):
-    def __init__(self):
-        super().__init__()
+# Mocking a function to check if a word can be formed on the game board
+def can_form_word_on_board(word, game_board):
+    """Check if the word can be formed on the current game board state."""
+    # Placeholder logic: just checks if the first letter of the word exists on the board
+    return any(word[0] in row for row in game_board)
 
-        self.title("5 by 5 Game")
-        self.short_words = []
-        self.long_words = []
-        self.ARRAY = []
-        self.last_button_clicked = None  # To keep track of the last button clicked
-        self.state = (
-            "input_letter"  # This can be "input_letter", "input_word", or "select_word"
+
+# Mocking a function to calculate score based on word length
+def calculate_score(word):
+    """Calculate score for a given word."""
+    return len(word) ** 2
+
+
+# Updating the WordGameGUI class to integrate these functions
+class WordGameGUI:
+    def __init__(self, master):
+        self.master = master
+        self.master.title("Five by Five")
+        self.master.geometry("700x300")
+
+        self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
+        self.my_array = create_array(5, 5, "#")
+
+        # Scoreboard GUI (Moved before initialize_game)
+        self.score_frame = ttk.Frame(master)
+        self.score_frame.grid(row=0, column=1, rowspan=2, sticky="nsew")
+
+        # scoreboard_contents Text widget
+        self.scoreboard_contents = tk.Text(
+            self.master, wrap=tk.WORD, width=30, height=20
         )
+        self.scoreboard_contents.grid(row=0, column=5, rowspan=6, sticky="nsew")
 
-        self.current_player = 1  # Player 1 starts
+        # Make the scoreboard_contents Text widget expand and fill the available space
+        self.master.grid_rowconfigure(0, weight=1)
+        self.master.grid_columnconfigure(5, weight=1)
 
-        # Create a frame for the grid and scoreboard
-        self.main_frame = tk.Frame(self)
-        self.main_frame.pack(side=tk.TOP, padx=10, pady=10)
+        # Game Board Initialization (Moved after scoreboard contents initialization)
 
-        # Create a frame for the grid
-        self.grid_frame = tk.Frame(self.main_frame)
-        self.grid_frame.pack(side=tk.LEFT, padx=10, pady=10)
+        # Game Board GUI
+        self.board_frame = ttk.Frame(master)
+        self.board_frame.grid(row=0, column=0, sticky="nsew")
+        self.buttons = {}
+        for i, j in itertools.product(range(5), range(5)):
+            btn = ttk.Button(
+                self.board_frame,
+                text=self.my_array[i][j],
+                command=lambda i=i, j=j: self.cell_clicked(i, j),
+            )
+            btn.grid(row=i, column=j, sticky="nsew", padx=5, pady=5)
+            self.buttons[(i, j)] = btn
+            self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
 
-        # Create the 5 by 5 grid of buttons
-        self.grid_buttons = []
-        for row in range(5):
-            button_row = []
-            for col in range(5):
-                button = tk.Button(self.grid_frame, text="", width=10, height=2)
-                button.grid(row=row, column=col, padx=2, pady=2)
-                button.config(command=lambda btn=button: self.on_button_click(btn))
-                button_row.append(button)
-            self.grid_buttons.append(button_row)
+        # Control Area GUI
+        self.control_frame = ttk.Frame(master)
+        self.control_frame.grid(row=1, column=0, sticky="ew")
+        self.pass_button = ttk.Button(
+            self.control_frame, text="Pass", command=self.cpu_move
+        )
+        self.pass_button.grid(row=1, column=0, padx=5, pady=5)
 
-        self.clicked_buttons = []  # List to keep track of clicked buttons in order
-        self.word = ""  # The current word being formed by the user
-        self.clicked_word = ""  # The word that is being clicked by the user
+        # Restart Button (New Game Button removed as requested)
+        self.restart_button = ttk.Button(
+            self.control_frame, text="Restart", command=self.restart_game
+        )
+        self.restart_button.grid(row=1, column=2, padx=5, pady=5)
+        self.initialize_game()
+        self.update_valid_cells()
 
-        # Create a frame for the scoreboard
-        self.scoreboard_frame = tk.Frame(self.main_frame)
-        self.scoreboard_frame.pack(side=tk.RIGHT, padx=10, pady=10)
-
-        # Create a label for the scoreboard
-        self.scoreboard_label = tk.Label(self.scoreboard_frame, text="Words Played:")
-        self.scoreboard_label.pack(side=tk.TOP)
-
-        # Create a label for the scoreboard
-        self.scoreboard_label = tk.Label(self.scoreboard_frame, text="Turn: {}")
-        self.scoreboard_label.pack(side=tk.TOP)
+    def initialize_game(self):
+        """Initialize the game board and related variables."""
+        self.my_array = create_array(5, 5, "#")
+        self.played_words = []  # List to store words that have been played
+        self.player_score = 0  # Player's score
+        self.cpu_score = 0  # CPU's score
+        first_word = start_word(
+            5, self.long_words
+        )  # Getting a 5-letter word for initialization
+        self.played_words.append(first_word)
+        set_first_word(self.my_array, first_word)
+        # Update the button text to reflect changes in my_array
+        for i, j in itertools.product(range(5), range(5)):
+            self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
+        self.update_valid_cells()  # Update the valid cells
+        # Update the scoreboard with initial values
         self.update_scoreboard()
 
-        # Create a text widget for the scoreboard
-        self.scoreboard_text = tk.Text(
-            self.scoreboard_frame, width=20, height=15, wrap=tk.WORD
-        )
-        self.scoreboard_text.pack(side=tk.TOP)
+    def update_valid_cells(self):
+        """
+        Disable all cells, then enable only the cells that are valid starting points
+        for a new word based on the current state of the game board.
+        """
+        # Disable all buttons first
+        for i, j in itertools.product(range(5), range(5)):
+            self.buttons[(i, j)].config(state=tk.DISABLED)
 
-        # Create a frame for the control buttons
-        self.control_frame = tk.Frame(self)
-        self.control_frame.pack(side=tk.TOP, padx=10, pady=10)
-
-        # Create control buttons
-        self.new_game_button = tk.Button(
-            self.control_frame, text="New Game", command=self.new_game
-        )
-        self.new_game_button.pack(side=tk.LEFT, padx=5)
-
-        self.quit_button = tk.Button(self.control_frame, text="Quit", command=self.quit)
-        self.quit_button.pack(side=tk.LEFT, padx=5)
-        self.new_game()
-
-    def on_button_click(self, button):
-        if self.current_player == 1:
-            if self.state == "input_letter" and button["text"] == "":
-                letter = self.get_letter()
-                if letter:
-                    button.config(text=letter)
-                    self.get_word_from_user()
-            elif self.state == "select_word":
-                self.add_button_to_word(button)
-
-    def get_word(self):
-        word = ""
-        while not word:
-            word = simpledialog.askstring(
-                "Enter Word", f"Player {self.current_player}, enter your word:"
-            )
-        return word
-
-    def is_valid_word(self, word):
-        if len(word) <= 4:
-            return word in self.short_words
-        else:
-            return word in self.long_words
-
-    def get_letter(self):
-        letter = ""
-        while not letter:
-            letter = simpledialog.askstring(
-                "Enter Letter", f"Player {self.current_player}, enter a letter:"
-            )
-            if letter:
-                letter = letter[0].upper()  # Get only the first character
-
-                # Check if the input is a letter
-                if not letter.isalpha():
-                    messagebox.showinfo("Invalid Input", "Please enter a letter.")
-                    letter = ""
-        return letter
-
-    def switch_player(self):
-        self.current_player = 3 - self.current_player
-        self.update_scoreboard()
-        if self.current_player == 2:
-            self.computer_move()
+        # Then enable only the valid cells
+        valid_cells = cells_to_play(self.my_array, "#")
+        for i, j in valid_cells:
+            self.buttons[(i, j)].config(state=tk.NORMAL)
 
     def update_scoreboard(self):
-        player_name = "Computer" if self.current_player == 2 else "Player One"
-        self.scoreboard_label.config(text=f"Turn: {player_name}")
+        """Update the scoreboard GUI with the current words and scores."""
+        self.scoreboard_contents.config(state=tk.NORMAL)  # Enable editing
+        self.scoreboard_contents.delete(1.0, tk.END)  # Clear existing content
 
-    def computer_move(self):
-        empty_buttons = [
-            (r, c)
-            for r, row in enumerate(self.grid_buttons)
-            for c, button in enumerate(row)
-            if button["text"] == ""
-        ]
-        if empty_buttons:
-            row, col = random.choice(empty_buttons)
-            letter = random.choice("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
-            self.grid_buttons[row][col].config(text=letter)
-            self.switch_player()
+        # Display the total scores for the player and CPU
+        self.scoreboard_contents.insert(
+            tk.END, f"Player Score: {self.player_score}\n", "player"
+        )
+        self.scoreboard_contents.insert(
+            tk.END, f"CPU Score: {self.cpu_score}\n\n", "cpu"
+        )
 
-            if self.board_full():
-                messagebox.showinfo("Game Over", "All spaces are filled!")
-                self.new_game()
+        # Display the initial word without points and with a different color (e.g., blue)
+        initial_word = self.played_words[0].upper()
+        self.scoreboard_contents.insert(tk.END, initial_word + "\n", "initial")
+        self.scoreboard_contents.tag_config("initial", foreground="blue")
 
-    def new_game(self):
-        # Reset the grid buttons
-        for row in self.grid_buttons:
-            for button in row:
-                button.config(text="")
+        # Display the remaining words and scores
+        for word in self.played_words[1:]:
+            score = calculate_score(word)
+            self.scoreboard_contents.insert(tk.END, f"{word.upper()}: {score}\n")
 
-        # Load words from the file
-        self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
+        self.scoreboard_contents.config(state=tk.DISABLED)  # Disable editing
 
-        # Create the initial state of the game board
-        self.ARRAY = create_array(5, 5, "#")
+    def cpu_move(self):
+        """Handle pass turn event (CPU's play)."""
+        # Logic for the CPU's turn adapted from simple_play.py
+        possible_paths = my_bad_function(
+            self.my_array, cells_to_play(self.my_array, "#")
+        )
+        if len(possible_paths) == 0:
+            print("\nFinished! Exiting...")
+            return
 
-        # Set the third row to contain a 5-letter word
-        START_WORD = start_word(5, self.long_words)
-        START_WORD = START_WORD.upper()
+        words_dict = possible_words_list(possible_paths, self.my_array)
+        current_state_words = get_current_state_words(
+            words_dict, self.played_words, self.long_words
+        )
 
-        for col, letter in enumerate(START_WORD):
-            self.grid_buttons[2][col].config(text=letter)
-            self.ARRAY[2][col] = letter  # Update the ARRAY with the START_WORD
+        if not current_state_words:
+            print("No words found in range 4-10, trying 1-4")
+            current_state_words = get_current_state_words(
+                words_dict, self.played_words, self.short_words
+            )
 
-        # Update the current player
-        self.current_player = 1
+        sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
+        max_length = sorted_current_state_words[0][0]
+        matching_words = [x for x in sorted_current_state_words if x[0] == max_length]
+        next_word_list = choice(matching_words)
+        next_word = choice(next_word_list[1])
+
+        for letter, position in zip(next_word, next_word_list[2]):
+            add_letter(self.my_array, letter, position[0], position[1])
+            self.buttons[(position[0], position[1])].config(text=letter.upper())
+
+        self.played_words.append(next_word)
+        self.cpu_score += calculate_score(next_word)
+        self.update_valid_cells()
         self.update_scoreboard()
 
-    def board_full(self):
-        for row in self.grid_buttons:
-            for button in row:
-                if button["text"] == "":
-                    return False
-        return True
+    def restart_game(self):
+        """Handle restart game event."""
+        self.initialize_game()
+        self.update_valid_cells()
 
-    def remove_last_letter(self):
-        if self.last_button_clicked:
-            self.last_button_clicked.config(text="")
-            self.last_button_clicked = None  # Reset the last button clicked
+    def show_letter_entry_dialog(self, i, j):
+        """
+        Show a dialog box to ask the user for a single letter.
+        This method is called when a valid cell (i, j) on the board is clicked.
+        """
+        # Ask the user for a letter
+        letter = simpledialog.askstring(
+            "Input", "Enter a single letter:", parent=self.master
+        )
 
-    def get_word_from_user(self):
-        word = simpledialog.askstring("Enter Word", "Player 1, enter your word:")
-        if word:
-            if self.word_exists(word.upper()):
-                self.word = word.upper()
-                self.state = "select_word"
-            else:
-                messagebox.showinfo(
-                    "Invalid Word", "The word you entered does not exist."
+        # Validate the input
+        if letter and len(letter) == 1 and letter.isalpha():
+            # If valid, update the board and the button text
+            self.my_array[i][j] = letter.upper()
+            self.buttons[(i, j)].config(text=letter.upper())
+
+            # Ask the user for a word
+            word = simpledialog.askstring("Input", "Enter a word:", parent=self.master)
+
+            # Validate the input word
+            if word and (
+                word.lower() in self.long_words or word.lower() in self.short_words
+            ):
+                # If valid, update the game state (e.g., update score,
+                # add word to played_words, etc.)
+                self.played_words.append(word.upper())
+                self.player_score += calculate_score(word)
+                self.update_scoreboard()
+                self.update_valid_cells()
+            elif word is not None:
+                # If invalid, show an error message
+                tk.messagebox.showerror(
+                    "Invalid Input", "The entered word is not valid."
                 )
-                # Remove the last inputted letter
-                for row in self.grid_buttons:
-                    for button in row:
-                        if button["text"] == "":
-                            button.config(text="")
-                            break
-                self.switch_player()
+                self.my_array[i][j] = "#"
+                self.buttons[(i, j)].config(text="#")
+            else:
+                # If Cancel is pressed, remove the letter and let the computer play
+                self.my_array[i][j] = "#"
+                self.buttons[(i, j)].config(text="#")
+        elif letter is not None:
+            # If invalid, show an error message
+            tk.messagebox.showerror(
+                "Invalid Input", "Please enter a single letter only."
+            )
+        self.cpu_move()
 
-    def add_button_to_word(self, button):
-        if button["text"] != "":
-            if not self.clicked_buttons:  # If the clicked buttons list is empty
-                self.clicked_buttons.append(button)
-                self.clicked_word += button["text"]
-            else:  # If there are already buttons in the clicked buttons list
-                last_button = self.clicked_buttons[-1]
-                last_button_row, last_button_col = self.get_button_position(last_button)
-                button_row, button_col = self.get_button_position(button)
-
-                # Only add the button to the clicked buttons list if it is adjacent to the last button
-                if (
-                    abs(button_row - last_button_row) <= 1
-                    and abs(button_col - last_button_col) <= 1
-                ):
-                    self.clicked_buttons.append(button)
-                    self.clicked_word += button["text"]
-
-            if self.clicked_word == self.word:
-                messagebox.showinfo("Correct", f"Correct word: {self.clicked_word}")
-                self.state = "input_letter"  # Reset the state
-                self.word = ""  # Reset the word
-                self.clicked_word = ""  # Reset the clicked word
-                self.clicked_buttons = []  # Reset the clicked buttons list
-                self.switch_player()
-
-    def word_exists(self, word):
-        if len(word) <= 4:
-            return word in self.short_words
-        else:
-            return word in self.long_words
+    def cell_clicked(self, i, j):
+        """
+        Called when a cell (i, j) on the board is clicked.
+        """
+        # Show the letter entry dialog box
+        self.show_letter_entry_dialog(i, j)
 
 
-if __name__ == "__main__":
-    app = WordGame()
-    app.mainloop()
-
-# Now, there's a scoreboard on the right-hand side of the grid.
-# You can add words to the scoreboard_text widget by using the insert method, for example:
-# self.scoreboard_text.insert(tk.END, f"{word}\n")
+root = tk.Tk()
+app = WordGameGUI(root)
+root.mainloop()

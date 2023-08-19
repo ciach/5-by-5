@@ -36,16 +36,16 @@ def load_words(
     return words_list_short, words_list_long
 
 
-def set_first_word(my_array, rows, cols, word_, orientation="horizontal"):
+def set_first_word(my_array, word_, orientation="horizontal"):
     """Sets the first word in the array"""
     word_ = word_.upper()
     middle_index = floor(len(word_) / 2)
     if orientation == "horizontal":
-        for cell in range(len(word_)):
-            my_array[middle_index][cell] = str(word_[cell])
+        for cell, letter in enumerate(word_):
+            my_array[middle_index][cell] = str(letter)
     elif orientation == "vertical":
-        for cell in range(len(word_)):
-            my_array[cell][middle_index] = str(word_[cell])
+        for cell, letter in enumerate(word_):
+            my_array[cell][middle_index] = str(letter)
     else:
         raise ValueError(
             "Invalid word orientation, should be 'vertical' or 'horizontal'"
@@ -120,6 +120,9 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
     Returns:
         bool: True if the user word is valid
     """
+
+    # depending on a lenght of the user word, need to check if rest of the letters exist in array
+
     return bool(
         user_word_ and user_word_ not in words_played_ and user_word_ in words_list
     )

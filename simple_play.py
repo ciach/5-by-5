@@ -1,4 +1,3 @@
-from pathlib import Path
 from time import perf_counter, time
 import os
 import logging
@@ -26,6 +25,35 @@ from words_func import (
 
 ARRAY = []
 ROWS, COLS = (5, 5)
+TEST_WORDS_PLAYED = [
+    "stela",
+    "bela",
+    "stelaż",
+    "tabela",
+    "stal",
+    "kaleta",
+    "lato",
+    "koleba",
+    "bula",
+    "cebula",
+    "ocelot",
+    "acetal",
+    "stos",
+    "psota",
+    "rubel",
+    "pastel",
+    "paskal",
+    "kolaż",
+    "kąt",
+    "kula",  # ara
+]
+TEST_ARRAY = [
+    ["P", "S", "A", "T", "Ą"],
+    ["A", "O", "C", "O", "K"],
+    ["S", "T", "E", "L", "A"],
+    ["K", "A", "B", "A", "Ż"],
+    ["O", "L", "U", "R", "A"],
+]
 
 # LOGGING SETUP
 logging.basicConfig(
@@ -87,7 +115,7 @@ if __name__ == "__main__":
     short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 10)
     ARRAY = create_array(ROWS, COLS, "#")
     START_WORD = start_word(ROWS, long_words)
-    set_first_word(ARRAY, ROWS, COLS, START_WORD)
+    set_first_word(ARRAY, START_WORD)
     words_played = [START_WORD.strip()]
     words_played_player_one = []
     words_played_player_two = []
@@ -97,83 +125,99 @@ if __name__ == "__main__":
 
     while True:
         # User plays
-        user_word = input("Enter a word (to pass, press ENTER): ")
-        if check_user_word(user_word, words_played, long_words) or check_user_word(
-            user_word, words_played, short_words
-        ):
-            console.print("Word is correct!")
-            user_letter = input("Enter a new letter: ")
-            if check_user_letter(user_letter):
-                user_path_str = input("Enter the letter position in format y,x: ")
-                user_path = user_path_str.split(",")
-                if check_user_path(user_path, ARRAY, "#"):
-                    console.print("Letter position is correct!")
-                    console.print(f"Your word is: [orchid1]{user_word}[/orchid1],")
-                    console.print(f"Your new letter is: {user_letter}")
-                    console.print(f"Position is: [orchid1]{user_path}[/orchid1]")
-                    logging.debug("User word: %s", user_word)
-                    logging.debug("User letter: %s", user_letter)
-                    logging.debug("User path: %s", user_path)
-                    add_letter(ARRAY, user_letter, int(user_path[0]), int(user_path[1]))
-                    words_played.append(user_word)
-                    words_played_player_one.append(user_word)
-                    console.print()
-                    show_array(ARRAY)
+        # check if there is a free space to play
+        if can_play := cells_to_play(ARRAY, "#"):
+            user_word = input("Enter a word (to pass, press ENTER): ")
+            if check_user_word(user_word, words_played, long_words) or check_user_word(
+                user_word, words_played, short_words
+            ):
+                console.print("Word is correct!")
+                user_letter = input("Enter a new letter: ")
+                if check_user_letter(user_letter):
+                    user_path_str = input("Enter the letter position in format y,x: ")
+                    user_path = user_path_str.split(",")
+                    if check_user_path(user_path, ARRAY, "#"):
+                        console.print("Letter position is correct!")
+                        console.print(f"Your word is: [orchid1]{user_word}[/orchid1],")
+                        console.print(f"Your new letter is: {user_letter}")
+                        console.print(f"Position is: [orchid1]{user_path}[/orchid1]")
+                        logging.debug("User word: %s", user_word)
+                        logging.debug("User letter: %s", user_letter)
+                        logging.debug("User path: %s", user_path)
+                        add_letter(
+                            ARRAY, user_letter, int(user_path[0]), int(user_path[1])
+                        )
+                        words_played.append(user_word)
+                        words_played_player_one.append(user_word)
+                        console.print()
+                        show_array(ARRAY)
+                    else:
+                        console.print(
+                            "Letter is incorrect! Should be one letter! Not a number!"
+                        )
+                        console.print("Computer will play!")
                 else:
-                    console.print(
-                        "Letter is incorrect! Should be one letter! Not a number!"
-                    )
+                    console.print("Letter is incorrect! Should be one letter!")
                     console.print("Computer will play!")
             else:
-                console.print("Letter is incorrect! Should be one letter!")
-                console.print("Computer will play!")
-        else:
-            logging.debug("No user word")
+                console.print("Word does not exist in dictionary!")
+                logging.debug("No user word")
 
-        # Computer plays
-        start = perf_counter()
-        possible_paths = my_bad_function(ARRAY, cells_to_play(ARRAY, "#"))
-        if len(possible_paths) == 0:
-            console.print("\nFinished! Exiting...", style="red")
-            logging.debug("Finished! Exiting...")
-            break
-        words_dict = possible_words_list(possible_paths, ARRAY)
+            # Computer plays
+            # check if there is a free space to play
+            if can_play := cells_to_play(ARRAY, "#"):
+                start = perf_counter()
+                possible_paths = my_bad_function(ARRAY, cells_to_play(ARRAY, "#"))
+                if len(possible_paths) == 0:
+                    console.print("\nFinished! Exiting...", style="red")
+                    logging.debug("Finished! Exiting...")
+                    break
+                words_dict = possible_words_list(possible_paths, ARRAY)
 
-        # Find words that can be played in the current stage
-        current_state_words = get_current_state_words(
-            words_dict, words_played, long_words
-        )
-        if not current_state_words:
-            logging.debug("No words found in range 3-7, trying 1-4")
-            current_state_words = get_current_state_words(
-                words_dict, words_played, short_words
-            )
+                # Find words that can be played in the current stage
+                current_state_words = get_current_state_words(
+                    words_dict, words_played, long_words
+                )
+                if not current_state_words:
+                    logging.debug("No words found in range 3-7, trying 1-4")
+                    console.print("No words found in range 3-7, trying 1-4")
+                    current_state_words = get_current_state_words(
+                        words_dict, words_played, short_words
+                    )
 
-        sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
-        max_length = sorted_current_state_words[0][0]
+                sorted_current_state_words = sorted(
+                    current_state_words, key=lambda x: -x[0]
+                )
+                max_length = sorted_current_state_words[0][0]
 
-        # Select the word to play next
-        matching_words = [x for x in sorted_current_state_words if x[0] == max_length]
-        next_word_list = choice(matching_words)
-        next_word = choice(next_word_list[1])
+                # Select the word to play next
+                matching_words = [
+                    x for x in sorted_current_state_words if x[0] == max_length
+                ]
+                next_word_list = choice(matching_words)
+                next_word = choice(next_word_list[1])
 
-        for letter, position in zip(next_word, next_word_list[2]):
-            add_letter(ARRAY, letter, position[0], position[1])
-        console.print(
-            f"\nNew word: [dark_olive_green2]{next_word}[/dark_olive_green2] {next_word_list[2]}"
-        )
-        words_played.append(next_word)
-        words_played_player_two.append(next_word)
-        end = perf_counter()
-        console.print(f"It took me: {end - start:.2f} seconds to find {next_word}.\n")
-        logging.debug("It took me %s seconds to find: %s.", end - start, next_word)
-        console.print(Columns(words_display(words_played)))
-        console.print(f"Player One: {score_display(words_played_player_one)}")
-        console.print(
-            f"Player Two (computer): {score_display(words_played_player_two)}"
-        )
-        show_array(ARRAY)
-        console.print()
+                for letter, position in zip(next_word, next_word_list[2]):
+                    add_letter(ARRAY, letter, position[0], position[1])
+                console.print(
+                    f"\nNew word: [dark_olive_green2]{next_word}[/dark_olive_green2] {next_word_list[2]}"
+                )
+                words_played.append(next_word)
+                words_played_player_two.append(next_word)
+                end = perf_counter()
+                console.print(
+                    f"It took me: {end - start:.2f} seconds to find {next_word}.\n"
+                )
+                logging.debug(
+                    "It took me %s seconds to find: %s.", end - start, next_word
+                )
+                console.print(Columns(words_display(words_played)))
+                console.print(f"Player One: {score_display(words_played_player_one)}")
+                console.print(
+                    f"Player Two (computer): {score_display(words_played_player_two)}"
+                )
+                show_array(ARRAY)
+                console.print()
 
     console.print(f"Player One: {score_display(words_played_player_one)}")
     console.print(f"Player Two (computer): {score_display(words_played_player_two)}")

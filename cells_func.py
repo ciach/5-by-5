@@ -1,14 +1,14 @@
 """CELLS FUNCTIONS"""
 from itertools import product
 from typing import List, Tuple, Dict
-from numpy import chararray
+from numpy import ndarray, full
 from rich.console import Console
 from rich.table import Table
 from rich.box import MINIMAL_DOUBLE_HEAD
 
 
-def create_array(rows: int, cols: int, empty_char: str) -> chararray:
-    """Create a 2D numpy chararray with the given dimensions and fill it with a specified character.
+def create_array(rows: int, cols: int, empty_char: str) -> ndarray:
+    """Create a 2D numpy ndarray with the given dimensions and fill it with a specified character.
 
     Args:
         rows (int): The number of rows in the array.
@@ -16,11 +16,9 @@ def create_array(rows: int, cols: int, empty_char: str) -> chararray:
         empty_char (str): The character to fill the array with.
 
     Returns:
-        chararray: A 2D numpy chararray filled with the specified character.
+        ndarray: A 2D numpy ndarray filled with the specified character.
     """
-    char_array = chararray((rows, cols), unicode=True)
-    char_array[:] = empty_char
-    return char_array
+    return full((rows, cols), empty_char, dtype=str)
 
 
 def show_array(my_array, console: Console = None):
@@ -138,7 +136,8 @@ def cells_to_play(
     my_array: List[List[str]], empty_char: str
 ) -> Dict[Tuple[int, int], List[Tuple[int, int]]]:
     """
-    For every cell in the array with a letter, returns a dictionary where the keys are cell coordinates
+    For every cell in the array with a letter, returns a dictionary where
+    the keys are cell coordinates
     and the values are lists of neighboring cells that can be played.
 
     Args:
@@ -156,6 +155,21 @@ def cells_to_play(
         for cell in cells
         if step(cell, my_array, empty_char)
     }
+
+
+def can_play(my_array: list) -> bool:
+    """checks if there any free cells in the array
+
+    Args:
+        my_array (list): list of lists containing the array
+    Returns:
+        bool: if there are free cells
+    """
+    for row in my_array:
+        for cell in row:
+            if cell == "#":
+                return True
+    return False
 
 
 def check_user_path(user_path: list, my_array: list, empty_char: str) -> bool:
