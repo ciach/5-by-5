@@ -1,9 +1,9 @@
 import itertools
 import tkinter as tk
-from time import perf_counter, time
-from numpy import full, ndarray
-from random import choice, randint
-from tkinter import ttk, simpledialog, messagebox
+from tkinter import ttk, simpledialog
+from time import time
+from random import choice
+
 from core_func import my_bad_function
 from cells_func import (
     cells_to_play,
@@ -12,7 +12,6 @@ from cells_func import (
 )
 from words_func import (
     add_letter,
-    check_user_word,
     load_words,
     find_word,
     start_word,
@@ -75,11 +74,19 @@ class WordGameGUI:
         )
         self.scoreboard_contents.grid(row=0, column=5, rowspan=6, sticky="nsew")
 
+        # Step 1: Create a Scrollbar Widget
+        self.scrollbar = tk.Scrollbar(self.master, orient=tk.VERTICAL)
+
+        # Step 2: Associate the Scrollbar with the Text Widget
+        self.scrollbar.config(command=self.scoreboard_contents.yview)
+        self.scoreboard_contents.config(yscrollcommand=self.scrollbar.set)
+
+        # Step 3: Place the Scrollbar Next to the Text Widget in the Grid
+        self.scrollbar.grid(row=0, column=6, rowspan=6, sticky="nsew")
+
         # Make the scoreboard_contents Text widget expand and fill the available space
         self.master.grid_rowconfigure(0, weight=1)
         self.master.grid_columnconfigure(5, weight=1)
-
-        # Game Board Initialization (Moved after scoreboard contents initialization)
 
         # Game Board GUI
         self.board_frame = ttk.Frame(master)
@@ -229,8 +236,13 @@ class WordGameGUI:
             word = simpledialog.askstring("Input", "Enter a word:", parent=self.master)
 
             # Validate the input word
-            if word and (
-                word.lower() in self.long_words or word.lower() in self.short_words
+            if (
+                word
+                and word
+                not in self.played_words  # Check if word has not been used before
+                and (
+                    word.lower() in self.long_words or word.lower() in self.short_words
+                )
             ):
                 # If valid, update the game state (e.g., update score,
                 # add word to played_words, etc.)
