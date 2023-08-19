@@ -38,14 +38,8 @@ def get_current_state_words(
                 current_state_words.append([len(answer[0]), modified_answer, path])
         if time() - start_time > time_limit:
             break
-    return current_state_words
-
-
-# Mocking a function to check if a word can be formed on the game board
-def can_form_word_on_board(word, game_board):
-    """Check if the word can be formed on the current game board state."""
-    # Placeholder logic: just checks if the first letter of the word exists on the board
-    return any(word[0] in row for row in game_board)
+    # Filter out words that have already been played
+    return [word for word in current_state_words if word not in words_played]
 
 
 # Mocking a function to calculate score based on word length
@@ -63,6 +57,8 @@ class WordGameGUI:
 
         self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
         self.my_array = create_array(5, 5, "#")
+
+        self.current_path = []
 
         # Scoreboard GUI (Moved before initialize_game)
         self.score_frame = ttk.Frame(master)
@@ -117,9 +113,6 @@ class WordGameGUI:
         self.restart_button.grid(row=1, column=2, padx=5, pady=5)
         self.initialize_game()
         self.update_valid_cells()
-
-        # Endgame scenario (comment out to test)
-        # self.setup_endgame_scenario()
 
     def initialize_game(self):
         """Initialize the game board and related variables."""
@@ -192,8 +185,7 @@ class WordGameGUI:
             self.my_array, cells_to_play(self.my_array, "#")
         )
         if len(possible_paths) == 0:
-            print("\nFinished! Exiting...")
-            return
+            self.announce_winner()
 
         words_dict = possible_words_list(possible_paths, self.my_array)
         current_state_words = get_current_state_words(
@@ -276,14 +268,16 @@ class WordGameGUI:
             tk.messagebox.showerror(
                 "Invalid Input", "Please enter a single letter only."
             )
-        self.cpu_move()
 
     def cell_clicked(self, i, j):
         """
         Called when a cell (i, j) on the board is clicked.
         """
+        if self.my_array[i][j] != "#":
+            return
         # Show the letter entry dialog box
         self.show_letter_entry_dialog(i, j)
+        self.cpu_move()
 
     def announce_winner(self):
         """_summary_"""
