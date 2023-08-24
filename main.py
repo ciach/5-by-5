@@ -1,4 +1,5 @@
 import itertools
+import socket
 import tkinter as tk
 from tkinter import ttk, simpledialog, messagebox
 from time import time
@@ -50,7 +51,7 @@ def calculate_score(word):
 
 # Updating the WordGameGUI class to integrate these functions
 class WordGameGUI:
-    def __init__(self, master):
+    def __init__(self, master, mode="single"):
         self.master = master
         self.master.title("Five by Five")
         self.master.geometry("700x300")
@@ -114,6 +115,10 @@ class WordGameGUI:
         self.initialize_game()
         self.update_valid_cells()
 
+        self.mode = mode
+        if self.mode == "multi":
+            self.setup_client()
+
     def initialize_game(self):
         """Initialize the game board and related variables."""
         self.my_array = create_array(5, 5, "#")
@@ -123,7 +128,7 @@ class WordGameGUI:
         first_word = start_word(
             5, self.long_words
         )  # Getting a 5-letter word for initialization
-        self.played_words.append(first_word)
+        self.played_words.append(first_word.lower())
         set_first_word(self.my_array, first_word)
         # Update the button text to reflect changes in my_array
         self.update_game_board()
@@ -166,7 +171,7 @@ class WordGameGUI:
         )
 
         # Display the initial word without points and with a different color (e.g., blue)
-        initial_word = self.played_words[0]
+        initial_word = self.played_words[0].upper()
         self.scoreboard_contents.insert(tk.END, initial_word + "\n", "initial")
         self.scoreboard_contents.tag_config("initial", foreground="blue")
 
@@ -207,6 +212,11 @@ class WordGameGUI:
         matching_words = [x for x in sorted_current_state_words if x[0] == max_length]
         next_word_list = choice(matching_words)
         next_word = choice(next_word_list[1])
+
+        # Making sure the chosen word is not in played_words
+        while next_word in self.played_words:
+            next_word_list = choice(matching_words)
+            next_word = choice(next_word_list[1])
 
         for letter, position in zip(next_word, next_word_list[2]):
             add_letter(self.my_array, letter, position[0], position[1])
@@ -283,7 +293,7 @@ class WordGameGUI:
         self.update_scoreboard()
         self.update_valid_cells()
         print(self.played_words)
-        self.master.after(100, self.cpu_move)
+        self.master.after(500, self.cpu_move)
         print(self.played_words)
 
     def announce_winner(self):
@@ -313,7 +323,18 @@ class WordGameGUI:
         # Update the valid cells based on the new board state
         self.update_valid_cells()
 
+    def setup_client(self):
+        # Set up client socket to connect to game server
+        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client_socket.connect(
+            ("127.0.0.1", 65432)
+        )  # Connect to server on localhost
+        welcome_message = self.client_socket.recv(1024)
+        print(welcome_message.decode())
 
+
+# mode = input("Choose game mode (single/multi): ").strip().lower()
 root = tk.Tk()
-app = WordGameGUI(root)
+# app = WordGameGUI(root, mode=mode)
+app = WordGameGUI(root, mode="single")
 root.mainloop()
