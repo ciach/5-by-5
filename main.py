@@ -126,8 +126,7 @@ class WordGameGUI:
         self.played_words.append(first_word)
         set_first_word(self.my_array, first_word)
         # Update the button text to reflect changes in my_array
-        for i, j in itertools.product(range(5), range(5)):
-            self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
+        self.update_game_board()
         self.update_valid_cells()  # Update the valid cells
         # Update the scoreboard with initial values
         self.update_scoreboard()
@@ -167,7 +166,7 @@ class WordGameGUI:
         )
 
         # Display the initial word without points and with a different color (e.g., blue)
-        initial_word = self.played_words[0].upper()
+        initial_word = self.played_words[0]
         self.scoreboard_contents.insert(tk.END, initial_word + "\n", "initial")
         self.scoreboard_contents.tag_config("initial", foreground="blue")
 
@@ -178,12 +177,17 @@ class WordGameGUI:
 
         self.scoreboard_contents.config(state=tk.DISABLED)  # Disable editing
 
+    def update_game_board(self):
+        """Update the game board GUI with the current state of the game board."""
+        for i, j in itertools.product(range(5), range(5)):
+            self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
+
     def cpu_move(self):
         """Handle pass turn event (CPU's play)."""
-        # Logic for the CPU's turn adapted from simple_play.py
         possible_paths = my_bad_function(
             self.my_array, cells_to_play(self.my_array, "#")
         )
+        # Check if the game is over (e.g., no cell left on the board)
         if len(possible_paths) == 0:
             self.announce_winner()
 
@@ -242,13 +246,11 @@ class WordGameGUI:
                 word
                 and word
                 not in self.played_words  # Check if word has not been used before
-                and (
-                    word.lower() in self.long_words or word.lower() in self.short_words
-                )
+                and (word in self.long_words or word in self.short_words)
             ):
                 # If valid, update the game state (e.g., update score,
                 # add word to played_words, etc.)
-                self.played_words.append(word.upper())
+                self.played_words.append(word)
                 self.player_score += calculate_score(word)
                 self.update_scoreboard()
                 self.update_valid_cells()
@@ -277,7 +279,12 @@ class WordGameGUI:
             return
         # Show the letter entry dialog box
         self.show_letter_entry_dialog(i, j)
-        self.cpu_move()
+        self.update_game_board()
+        self.update_scoreboard()
+        self.update_valid_cells()
+        print(self.played_words)
+        self.master.after(100, self.cpu_move)
+        print(self.played_words)
 
     def announce_winner(self):
         """_summary_"""
@@ -301,8 +308,7 @@ class WordGameGUI:
         self.my_array[4][4] = "#"
 
         # Step 3: Update the GUI
-        for i, j in itertools.product(range(5), range(5)):
-            self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
+        self.update_game_board()
 
         # Update the valid cells based on the new board state
         self.update_valid_cells()
