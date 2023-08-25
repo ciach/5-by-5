@@ -1,6 +1,7 @@
 import itertools
 import socket
 import tkinter as tk
+from tkinter import font
 from tkinter import ttk, simpledialog, messagebox
 from time import time
 from random import choice
@@ -55,6 +56,8 @@ class WordGameGUI:
         self.master = master
         self.master.title("Five by Five")
         self.master.geometry("700x300")
+        default_font = font.nametofont("TkDefaultFont")
+        default_font.configure(family="Arial", size=12)
 
         self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
         self.my_array = create_array(5, 5, "#")
