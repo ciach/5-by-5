@@ -11,7 +11,7 @@ from time import time
 
 def calculate_score(word):
     """Calculate score for a given word."""
-    return len(word) ** 2
+    return len(word) ** 2 if word.isalpha() else 0
 
 
 def load_words(
