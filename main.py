@@ -104,6 +104,8 @@ class WordGameGUI:
 
     def initialize_game(self):
         """Initialize the game board and related variables."""
+        self.player_score = 0
+        self.cpu_score = 0
         self.player_score_label.config(text=f"Player Score: {self.player_score}")
         self.cpu_score_label.config(text=f"CPU Score: {self.cpu_score}")
         self.turn_label.config(text="Turn: Player")
@@ -275,7 +277,6 @@ class WordGameGUI:
         self.update_game_board()
         self.update_scoreboard()
         self.update_valid_cells()
-        print(self.played_words)
         self.master.after(500, self.cpu_move)
         print(self.played_words)
 
