@@ -3,7 +3,6 @@ import socket
 import tkinter as tk
 from tkinter import font
 from tkinter import ttk, simpledialog, messagebox
-from time import time
 from random import choice
 
 from core_func import my_bad_function
@@ -12,57 +11,32 @@ from cells_func import (
     create_array,
     possible_words_list,
 )
+
 from words_func import (
     add_letter,
+    calculate_score,
+    get_current_state_words,
     load_words,
-    find_word,
     start_word,
     set_first_word,
 )
 
 
-def get_current_state_words(
-    word_dict: dict,
-    words_played: list,
-    words_list: list,
-) -> list:
-    """
-    Retrieve all words that can be played in the current stage
-    and exclude the ones that are already played.
-    """
-    current_state_words = []
-    time_limit = 60  # seconds
-    start_time = time()
-    for key, path in word_dict.items():
-        answer = find_word(key, words_list)
-        if len(answer) > 0:
-            if modified_answer := [word for word in answer if word not in words_played]:
-                current_state_words.append([len(answer[0]), modified_answer, path])
-        if time() - start_time > time_limit:
-            break
-    # Filter out words that have already been played
-    return [word for word in current_state_words if word not in words_played]
-
-
-# Mocking a function to calculate score based on word length
-def calculate_score(word):
-    """Calculate score for a given word."""
-    return len(word) ** 2
-
-
 # Updating the WordGameGUI class to integrate these functions
 class WordGameGUI:
     def __init__(self, master, mode="single"):
+        self.played_words = []  # List to store words that have been played
+        self.player_score = 0  # Player's score
+        self.cpu_score = 0  # CPU's score
+        self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
+        self.my_array = create_array(5, 5, "#")
+        self.current_path = []
+
         self.master = master
         self.master.title("Five by Five")
         self.master.geometry("700x300")
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Arial", size=12)
-
-        self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
-        self.my_array = create_array(5, 5, "#")
-
-        self.current_path = []
 
         # Scoreboard GUI (Moved before initialize_game)
         self.score_frame = ttk.Frame(master)
@@ -105,6 +79,12 @@ class WordGameGUI:
         # Control Area GUI
         self.control_frame = ttk.Frame(master)
         self.control_frame.grid(row=1, column=0, sticky="ew")
+        self.player_score_label = ttk.Label(self.control_frame)
+        self.player_score_label.grid(row=0, column=0, padx=30, pady=20)
+        self.cpu_score_label = ttk.Label(self.control_frame)
+        self.cpu_score_label.grid(row=0, column=1, padx=30, pady=20)
+        self.turn_label = ttk.Label(self.control_frame)
+        self.turn_label.grid(row=0, column=2, padx=30, pady=20)
         self.pass_button = ttk.Button(
             self.control_frame, text="Pass", command=self.cpu_move
         )
@@ -114,7 +94,7 @@ class WordGameGUI:
         self.restart_button = ttk.Button(
             self.control_frame, text="Restart", command=self.restart_game
         )
-        self.restart_button.grid(row=1, column=2, padx=5, pady=5)
+        self.restart_button.grid(row=1, column=1, padx=5, pady=5)
         self.initialize_game()
         self.update_valid_cells()
 
@@ -124,10 +104,10 @@ class WordGameGUI:
 
     def initialize_game(self):
         """Initialize the game board and related variables."""
-        self.my_array = create_array(5, 5, "#")
-        self.played_words = []  # List to store words that have been played
-        self.player_score = 0  # Player's score
-        self.cpu_score = 0  # CPU's score
+        self.player_score_label.config(text=f"Player Score: {self.player_score}")
+        self.cpu_score_label.config(text=f"CPU Score: {self.cpu_score}")
+        self.turn_label.config(text="Turn: Player")
+        self.played_words = []
         first_word = start_word(
             5, self.long_words
         )  # Getting a 5-letter word for initialization
@@ -165,14 +145,6 @@ class WordGameGUI:
         self.scoreboard_contents.config(state=tk.NORMAL)  # Enable editing
         self.scoreboard_contents.delete(1.0, tk.END)  # Clear existing content
 
-        # Display the total scores for the player and CPU
-        self.scoreboard_contents.insert(
-            tk.END, f"Player Score: {self.player_score}\n", "player"
-        )
-        self.scoreboard_contents.insert(
-            tk.END, f"CPU Score: {self.cpu_score}\n\n", "cpu"
-        )
-
         # Display the initial word without points and with a different color (e.g., blue)
         initial_word = self.played_words[0].upper()
         self.scoreboard_contents.insert(tk.END, initial_word + "\n", "initial")
@@ -184,6 +156,8 @@ class WordGameGUI:
             self.scoreboard_contents.insert(tk.END, f"{word.upper()}: {score}\n")
 
         self.scoreboard_contents.config(state=tk.DISABLED)  # Disable editing
+        self.player_score_label.config(text=f"Player Score: {self.player_score}")
+        self.cpu_score_label.config(text=f"CPU Score: {self.cpu_score}")
 
     def update_game_board(self):
         """Update the game board GUI with the current state of the game board."""
@@ -192,6 +166,9 @@ class WordGameGUI:
 
     def cpu_move(self):
         """Handle pass turn event (CPU's play)."""
+        self.turn_label.config(text="Turn: CPU")
+        self.master.update_idletasks()
+
         possible_paths = my_bad_function(
             self.my_array, cells_to_play(self.my_array, "#")
         )
@@ -229,11 +206,14 @@ class WordGameGUI:
         self.cpu_score += calculate_score(next_word)
         self.update_valid_cells()
         self.update_scoreboard()
+        self.turn_label.config(text="Turn: Player")
+        self.master.update_idletasks()
 
     def restart_game(self):
         """Handle restart game event."""
         self.initialize_game()
         self.update_valid_cells()
+        self.update_scoreboard()
 
     def show_letter_entry_dialog(self, i, j):
         """

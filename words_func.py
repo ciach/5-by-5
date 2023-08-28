@@ -6,6 +6,12 @@ from math import floor
 from random import choice
 from re import compile as re_compile
 from re import match
+from time import time
+
+
+def calculate_score(word):
+    """Calculate score for a given word."""
+    return len(word) ** 2
 
 
 def load_words(
@@ -126,3 +132,26 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
     return bool(
         user_word_ and user_word_ not in words_played_ and user_word_ in words_list
     )
+
+
+def get_current_state_words(
+    word_dict: dict,
+    words_played: list,
+    words_list: list,
+) -> list:
+    """
+    Retrieve all words that can be played in the current stage
+    and exclude the ones that are already played.
+    """
+    current_state_words = []
+    time_limit = 60  # seconds
+    start_time = time()
+    for key, path in word_dict.items():
+        answer = find_word(key, words_list)
+        if len(answer) > 0:
+            if modified_answer := [word for word in answer if word not in words_played]:
+                current_state_words.append([len(answer[0]), modified_answer, path])
+        if time() - start_time > time_limit:
+            break
+    # Filter out words that have already been played
+    return [word for word in current_state_words if word not in words_played]
