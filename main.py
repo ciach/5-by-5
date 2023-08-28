@@ -60,11 +60,12 @@ class CustomInputDialog(tk.Toplevel):
 class WordGameGUI:
     def __init__(self, master, mode="single"):
         self.played_words = []  # List to store words that have been played
+        self.current_word_path = []  # List to store the current word path
         self.player_score = 0  # Player's score
         self.cpu_score = 0  # CPU's score
+        self.player_move_completed = False
         self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
         self.my_array = create_array(5, 5, "#")
-        self.current_path = []
 
         self.master = master
         self.master.title("Five by Five")
@@ -114,11 +115,11 @@ class WordGameGUI:
         self.control_frame = ttk.Frame(master)
         self.control_frame.grid(row=1, column=0, sticky="ew")
         self.player_score_label = ttk.Label(self.control_frame)
-        self.player_score_label.grid(row=0, column=0, padx=30, pady=20)
+        self.player_score_label.grid(row=0, column=0, padx=20, pady=20)
         self.cpu_score_label = ttk.Label(self.control_frame)
-        self.cpu_score_label.grid(row=0, column=1, padx=30, pady=20)
+        self.cpu_score_label.grid(row=0, column=1, padx=20, pady=20)
         self.turn_label = ttk.Label(self.control_frame)
-        self.turn_label.grid(row=0, column=2, padx=30, pady=20)
+        self.turn_label.grid(row=0, column=2, padx=20, pady=20)
         self.pass_button = ttk.Button(
             self.control_frame, text="Pass", command=self.handle_pass
         )
@@ -241,8 +242,9 @@ class WordGameGUI:
 
         self.played_words.append(next_word)
         self.cpu_score += calculate_score(next_word)
-        self.update_valid_cells()
         self.update_scoreboard()
+        self.master.update_idletasks()
+        self.update_valid_cells()
         self.turn_label.config(text="Turn: Player")
         self.master.update_idletasks()
 
@@ -263,10 +265,6 @@ class WordGameGUI:
         )
         self.master.wait_window(letter_dialog)
 
-        if letter_dialog.result is None:
-            self.played_words.append("( None )")
-            return  # Exit the function if dialog was closed or cancelled
-
         letter = letter_dialog.result
 
         # Validate the input letter
@@ -283,38 +281,39 @@ class WordGameGUI:
                 # Reset the cell if word input is cancelled
                 self.my_array[i][j] = "#"
                 self.buttons[(i, j)].config(text="#")
-                self.played_words.append("( None )")
-                return
-
-            word = word_dialog.result
-
-            # Validate the input word
-            if (
-                word
-                and word
-                not in self.played_words  # Check if word has not been used before
-                and (word in self.long_words or word in self.short_words)
-            ):
-                # If valid, update the game state
-                self.played_words.append(word)
-                self.player_score += calculate_score(word)
-                self.update_scoreboard()
-                self.update_valid_cells()
+                self.player_move_completed = False
             else:
-                # If invalid word, show an error message
-                tk.messagebox.showerror(
-                    "Invalid Input", "The entered word is not valid."
-                )
-                self.played_words.append(f"( {word} )")
-                self.my_array[i][j] = "#"
-                self.buttons[(i, j)].config(text="#")
+                word = word_dialog.result.strip().lower()
 
+                # Validate the input word
+                if (
+                    word
+                    and word
+                    not in self.played_words  # Check if word has not been used before
+                    and (word in self.long_words or word in self.short_words)
+                ):
+                    # If valid, update the game state
+                    self.played_words.append(word)
+                    self.player_score += calculate_score(word)
+                    self.update_scoreboard()
+                    self.update_valid_cells()
+                else:
+                    # If invalid word, show an error message
+                    tk.messagebox.showerror(
+                        "Invalid Input", "The entered word is not valid."
+                    )
+                    self.played_words.append(f"( {word} )")
+                    self.my_array[i][j] = "#"
+                    self.buttons[(i, j)].config(text="#")
+                self.player_move_completed = True
+        elif letter is None:
+            self.player_move_completed = False
         else:
             # If invalid letter, show an error message
             tk.messagebox.showerror(
                 "Invalid Input", "Please enter a single letter only."
             )
-            self.played_words.append("( None )")
+            self.player_move_completed = False
 
     def cell_clicked(self, i, j):
         """
@@ -324,11 +323,12 @@ class WordGameGUI:
             return
         # Show the letter entry dialog box
         self.show_letter_entry_dialog(i, j)
-        self.update_game_board()
-        self.update_scoreboard()
-        self.update_valid_cells()
-        self.master.after(500, self.cpu_move)
-        print(self.played_words)
+        if self.player_move_completed:
+            self.update_game_board()
+            self.update_scoreboard()
+            self.update_valid_cells()
+            self.master.after(500, self.cpu_move)
+            print(self.played_words)
 
     def announce_winner(self):
         """_summary_"""
@@ -349,6 +349,11 @@ class WordGameGUI:
         self.update_scoreboard()
         self.cpu_move()
 
+    def highlight_path(self, path, color="green"):
+        """Highlight the given path on the game board with the given color."""
+        for i, j in path:
+            self.buttons[(i, j)].config(bg=color)
+
     def setup_endgame_scenario(self):
         """_summary_"""
         for i, j in itertools.product(range(5), range(5)):
@@ -356,11 +361,8 @@ class WordGameGUI:
 
         # Leave the last cell empty to simulate one cell left
         self.my_array[4][4] = "#"
-
-        # Step 3: Update the GUI
+        self.player_score = 1250
         self.update_game_board()
-
-        # Update the valid cells based on the new board state
         self.update_valid_cells()
 
     def setup_client(self):
