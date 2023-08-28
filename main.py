@@ -22,6 +22,40 @@ from words_func import (
 )
 
 
+class CustomInputDialog(tk.Toplevel):
+    def __init__(self, parent, title, message):
+        super().__init__(parent)
+        self.title(title)
+        self.result = None  # default value
+        self.label = tk.Label(self, text=message)
+        self.label.pack(padx=10, pady=10)
+
+        self.entry = tk.Entry(self)
+        self.entry.pack(padx=10, pady=10)
+        self.entry.bind("<Return>", lambda event=None: self.on_ok())
+        self.entry.focus_set()
+
+        self.ok_button = tk.Button(self, text="OK", command=self.on_ok)
+        self.ok_button.pack(side=tk.LEFT, padx=10, pady=10)
+
+        self.cancel_button = tk.Button(self, text="Cancel", command=self.on_cancel)
+        self.cancel_button.pack(side=tk.LEFT, padx=10, pady=10)
+
+        x_pos = parent.winfo_x() + 500
+        y_pos = parent.winfo_y() + 50
+        self.geometry(f"+{x_pos}+{y_pos}")
+
+    def on_ok(self):
+        """on clicking OK button"""
+        self.result = self.entry.get()
+        self.destroy()
+
+    def on_cancel(self):
+        """on clicking cancel button"""
+        self.result = None
+        self.destroy()
+
+
 # Updating the WordGameGUI class to integrate these functions
 class WordGameGUI:
     def __init__(self, master, mode="single"):
@@ -34,9 +68,9 @@ class WordGameGUI:
 
         self.master = master
         self.master.title("Five by Five")
-        self.master.geometry("700x300")
+        self.master.geometry("800x300")
         default_font = font.nametofont("TkDefaultFont")
-        default_font.configure(family="Arial", size=12)
+        default_font.configure(family="Consolas", size=10)
 
         # Scoreboard GUI (Moved before initialize_game)
         self.score_frame = ttk.Frame(master)
@@ -86,7 +120,7 @@ class WordGameGUI:
         self.turn_label = ttk.Label(self.control_frame)
         self.turn_label.grid(row=0, column=2, padx=30, pady=20)
         self.pass_button = ttk.Button(
-            self.control_frame, text="Pass", command=self.cpu_move
+            self.control_frame, text="Pass", command=self.handle_pass
         )
         self.pass_button.grid(row=1, column=0, padx=5, pady=5)
 
@@ -110,6 +144,7 @@ class WordGameGUI:
         self.cpu_score_label.config(text=f"CPU Score: {self.cpu_score}")
         self.turn_label.config(text="Turn: Player")
         self.played_words = []
+        self.my_array = create_array(5, 5, "#")
         first_word = start_word(
             5, self.long_words
         )  # Getting a 5-letter word for initialization
@@ -223,18 +258,35 @@ class WordGameGUI:
         This method is called when a valid cell (i, j) on the board is clicked.
         """
         # Ask the user for a letter
-        letter = simpledialog.askstring(
-            "Input", "Enter a single letter:", parent=self.master
+        letter_dialog = CustomInputDialog(
+            self.master, "Input", "Enter a single letter:"
         )
+        self.master.wait_window(letter_dialog)
 
-        # Validate the input
+        if letter_dialog.result is None:
+            self.played_words.append("( None )")
+            return  # Exit the function if dialog was closed or cancelled
+
+        letter = letter_dialog.result
+
+        # Validate the input letter
         if letter and len(letter) == 1 and letter.isalpha():
             # If valid, update the board and the button text
             self.my_array[i][j] = letter.upper()
             self.buttons[(i, j)].config(text=letter.upper())
 
             # Ask the user for a word
-            word = simpledialog.askstring("Input", "Enter a word:", parent=self.master)
+            word_dialog = CustomInputDialog(self.master, "Input", "Enter a word:")
+            self.master.wait_window(word_dialog)
+
+            if word_dialog.result is None:
+                # Reset the cell if word input is cancelled
+                self.my_array[i][j] = "#"
+                self.buttons[(i, j)].config(text="#")
+                self.played_words.append("( None )")
+                return
+
+            word = word_dialog.result
 
             # Validate the input word
             if (
@@ -243,28 +295,26 @@ class WordGameGUI:
                 not in self.played_words  # Check if word has not been used before
                 and (word in self.long_words or word in self.short_words)
             ):
-                # If valid, update the game state (e.g., update score,
-                # add word to played_words, etc.)
+                # If valid, update the game state
                 self.played_words.append(word)
                 self.player_score += calculate_score(word)
                 self.update_scoreboard()
                 self.update_valid_cells()
-            elif word is not None:
-                # If invalid, show an error message
+            else:
+                # If invalid word, show an error message
                 tk.messagebox.showerror(
                     "Invalid Input", "The entered word is not valid."
                 )
+                self.played_words.append(f"( {word} )")
                 self.my_array[i][j] = "#"
                 self.buttons[(i, j)].config(text="#")
-            else:
-                # If Cancel is pressed, remove the letter and let the computer play
-                self.my_array[i][j] = "#"
-                self.buttons[(i, j)].config(text="#")
-        elif letter is not None:
-            # If invalid, show an error message
+
+        else:
+            # If invalid letter, show an error message
             tk.messagebox.showerror(
                 "Invalid Input", "Please enter a single letter only."
             )
+            self.played_words.append("( None )")
 
     def cell_clicked(self, i, j):
         """
@@ -292,6 +342,12 @@ class WordGameGUI:
         # Show the message box with the winner announcement
         messagebox.showinfo("Game Over", winner_message)
         self.restart_game()
+
+    def handle_pass(self):
+        """Handle the event when the player decides to pass their turn."""
+        self.played_words.append("( None )")
+        self.update_scoreboard()
+        self.cpu_move()
 
     def setup_endgame_scenario(self):
         """_summary_"""
