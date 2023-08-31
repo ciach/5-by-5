@@ -4,6 +4,8 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk, messagebox
 from random import choice
+from tabulate import tabulate
+
 
 from core_func import my_bad_function
 from cells_func import (
@@ -41,8 +43,8 @@ class CustomInputDialog(tk.Toplevel):
         self.cancel_button = tk.Button(self, text="Cancel", command=self.on_cancel)
         self.cancel_button.pack(side=tk.LEFT, padx=10, pady=10)
 
-        x_pos = parent.winfo_x() + 500
-        y_pos = parent.winfo_y() + 50
+        x_pos = parent.winfo_x() + 520
+        y_pos = parent.winfo_y() + 10
         self.geometry(f"+{x_pos}+{y_pos}")
 
     def on_ok(self):
@@ -54,6 +56,31 @@ class CustomInputDialog(tk.Toplevel):
         """on clicking cancel button"""
         self.result = None
         self.destroy()
+
+
+class TabulateLabel(tk.Label):
+    def __init__(self, parent, player_words, cpu_words, **kwargs):
+        super().__init__(
+            parent, font=("Consolas", 10), justify=tk.LEFT, anchor="nw", **kwargs
+        )
+
+        # Determine the length of the longer list
+        max_length = max(len(player_words), len(cpu_words))
+
+        # Dynamically create the data based on the length of the longer list
+        data = [("Player", "Points", "Cpu", "Points")]
+        for i in range(max_length):
+            player_word = player_words[i] if i < len(player_words) else ""
+            cpu_word = cpu_words[i] if i < len(cpu_words) else ""
+            player_points = str(calculate_score(player_word)) if player_word else ""
+            cpu_points = str(calculate_score(cpu_word)) if cpu_word else ""
+
+            data.append(
+                (player_word.upper(), player_points, cpu_word.upper(), cpu_points)
+            )
+
+        text = tabulate(data, headers="firstrow", tablefmt="github", showindex=False)
+        self.configure(text=text)
 
 
 # Updating the WordGameGUI class to integrate these functions
@@ -75,7 +102,7 @@ class WordGameGUI:
 
         self.master = master
         self.master.title("Five by Five")
-        self.master.geometry("800x400")
+        self.master.geometry("830x330")
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Consolas", size=10)
 
@@ -83,29 +110,16 @@ class WordGameGUI:
         style.configure("Green.TButton", background="green")
         style.configure("Grey.TButton", background="grey")
 
-        # Scoreboard GUI (Moved before initialize_game)
-        self.score_frame = ttk.Frame(master)
-        self.score_frame.grid(row=0, column=1, rowspan=2, sticky="nsew")
-
-        # scoreboard_contents Text widget
-        self.scoreboard_contents = tk.Text(
-            self.master, wrap=tk.WORD, width=30, height=20
+        # Scoreboard GUI (TabulateLabel)
+        self.scoreboard_label = TabulateLabel(
+            self.master,
+            self.player_words,
+            self.cpu_words,
+            width=40,
+            height=20,
+            bg="white",
         )
-        self.scoreboard_contents.grid(row=0, column=5, rowspan=6, sticky="nsew")
-
-        # Step 1: Create a Scrollbar Widget
-        self.scrollbar = tk.Scrollbar(self.master, orient=tk.VERTICAL)
-
-        # Step 2: Associate the Scrollbar with the Text Widget
-        self.scrollbar.config(command=self.scoreboard_contents.yview)
-        self.scoreboard_contents.config(yscrollcommand=self.scrollbar.set)
-
-        # Step 3: Place the Scrollbar Next to the Text Widget in the Grid
-        self.scrollbar.grid(row=0, column=6, rowspan=6, sticky="nsew")
-
-        # Make the scoreboard_contents Text widget expand and fill the available space
-        self.master.grid_rowconfigure(0, weight=1)
-        self.master.grid_columnconfigure(5, weight=1)
+        self.scoreboard_label.grid(row=0, column=5, rowspan=6, sticky="nsew")
 
         # Game Board GUI
         self.board_frame = ttk.Frame(master)
@@ -157,6 +171,8 @@ class WordGameGUI:
         self.cpu_score_label.config(text=f"CPU Score: {self.cpu_score}")
         self.turn_label.config(text="Turn: Player")
         self.played_words = []
+        self.player_words = []
+        self.cpu_words = []
         self.my_array = create_array(5, 5, "#")
         first_word = start_word(
             5, self.long_words
@@ -192,20 +208,15 @@ class WordGameGUI:
 
     def update_scoreboard(self):
         """Update the scoreboard GUI with the current words and scores."""
-        self.scoreboard_contents.config(state=tk.NORMAL)  # Enable editing
-        self.scoreboard_contents.delete(1.0, tk.END)  # Clear existing content
+        self.scoreboard_label.config(state=tk.NORMAL)  # Enable editing
 
-        # Display the initial word without points and with a different color (e.g., blue)
-        initial_word = self.played_words[0].upper()
-        self.scoreboard_contents.insert(tk.END, initial_word + "\n", "initial")
-        self.scoreboard_contents.tag_config("initial", foreground="blue")
+        # Update the TabulateLabel with the current words and scores
+        self.scoreboard_label = TabulateLabel(
+            self.master, self.player_words, self.cpu_words, bg="white"
+        )
+        self.scoreboard_label.grid(row=0, column=5, rowspan=6, sticky="nsew")
 
-        # Display the remaining words and scores
-        for word in self.played_words[1:]:
-            score = calculate_score(word)
-            self.scoreboard_contents.insert(tk.END, f"{word.upper()}: {score}\n")
-
-        self.scoreboard_contents.config(state=tk.DISABLED)  # Disable editing
+        # Update player and CPU scores
         self.player_score_label.config(text=f"Player Score: {self.player_score}")
         self.cpu_score_label.config(text=f"CPU Score: {self.cpu_score}")
 
@@ -346,6 +357,7 @@ class WordGameGUI:
             self.word_from_path.append(self.my_array[i][j])
             if "".join(self.word_from_path).lower() == self.word.lower():
                 self.played_words.append(self.word)
+                self.player_words.append(self.word)
                 self.player_score += calculate_score(self.word)
                 self.update_game_board()
                 self.update_scoreboard()
