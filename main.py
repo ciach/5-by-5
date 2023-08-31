@@ -60,6 +60,8 @@ class CustomInputDialog(tk.Toplevel):
 class WordGameGUI:
     def __init__(self, master, mode="single"):
         self.played_words = []  # List to store words that have been played
+        self.player_words = []  # List to store words played by the player
+        self.cpu_words = []  # List to store words played by the CPU
         self.player_score = 0  # Player's score
         self.word = ""  # Word entered by the player
         self.cpu_score = 0  # CPU's score
@@ -253,6 +255,7 @@ class WordGameGUI:
             self.buttons[(position[0], position[1])].config(text=letter.upper())
 
         self.played_words.append(next_word)
+        self.cpu_words.append(next_word)
         self.cpu_score += calculate_score(next_word)
         self.update_scoreboard()
         self.master.update_idletasks()
@@ -315,6 +318,7 @@ class WordGameGUI:
                         "Invalid Input", "The entered word is not valid."
                     )
                     self.played_words.append(f"( {self.word} )")
+                    self.player_words.append(f"( {self.word} )")
                     self.my_array[i][j] = "#"
                     self.buttons[(i, j)].config(text="#")
                     # Get out of the loop if the word is invalid
@@ -347,7 +351,9 @@ class WordGameGUI:
                 self.update_scoreboard()
                 self.update_valid_cells()
                 self.master.after(500, self.cpu_move)
-                print(f"T:F:{self.played_words}")
+                print(
+                    f"(DEBUG): T:F: {self.played_words}, P:{self.player_words}, C:{self.cpu_words}"
+                )
                 self.is_path_validated = True
                 self.word_from_path = []
         elif self.is_player_move_completed and self.is_path_validated:
