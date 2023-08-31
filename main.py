@@ -317,6 +317,9 @@ class WordGameGUI:
                     self.played_words.append(f"( {self.word} )")
                     self.my_array[i][j] = "#"
                     self.buttons[(i, j)].config(text="#")
+                    # Get out of the loop if the word is invalid
+                    self.is_path_validated = True
+                    self.is_player_move_completed = True
                 self.is_player_move_completed = True
         elif letter is None:
             self.is_player_move_completed = False
