@@ -163,6 +163,25 @@ class WordGameGUI:
         )
         self.restart_button.grid(row=1, column=1, padx=5, pady=5)
 
+        # Creating the Menu Bar
+        self.menubar = tk.Menu(master)
+
+        # File Dropdown
+        self.filemenu = tk.Menu(self.menubar, tearoff=0)
+        self.filemenu.add_command(label="Restart", command=self.restart_game)
+        self.filemenu.add_command(label="Exit", command=master.quit)
+        self.menubar.add_cascade(label="File", menu=self.filemenu)
+
+        # User Time Dropdown
+        self.time_menu = tk.Menu(self.menubar, tearoff=0)
+        self.time_menu.add_command(label="1 min", command=lambda: self.set_time(1))
+        self.time_menu.add_command(label="3 min", command=lambda: self.set_time(3))
+        self.time_menu.add_command(label="5 min", command=lambda: self.set_time(5))
+        self.menubar.add_cascade(label="User Time", menu=self.time_menu)
+
+        # Display the Menu Bar
+        master.config(menu=self.menubar)
+
         self.initialize_game()
         self.update_valid_cells()
 
