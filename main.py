@@ -1,3 +1,4 @@
+import argparse
 import itertools
 import socket
 import tkinter as tk
@@ -97,9 +98,15 @@ class WordGameGUI:
         self.current_word_path = []  # List to store the current word path
         self.player_words_paths = []  # List of lists to store the player's word paths
         self.word_from_path = []
-        self.short_words, self.long_words = load_words("rzeczowniki_rm.txt", 4, 10)
-        self.my_array = create_array(5, 5, "#")
 
+        # Choose the appropriate dictionary based on the language argument
+        if args.language == "pl":
+            dictionary_file = "rzeczowniki_rm.txt"
+        else:  # Default to English
+            dictionary_file = "singular_nouns.txt"
+        self.short_words, self.long_words = load_words(dictionary_file, 4, 10)
+
+        self.my_array = create_array(5, 5, "#")
         self.master = master
         self.master.title("Five by Five")
         self.master.geometry("830x330")
@@ -419,8 +426,20 @@ class WordGameGUI:
         print(welcome_message.decode())
 
 
-# mode = input("Choose game mode (single/multi): ").strip().lower()
-root = tk.Tk()
-# app = WordGameGUI(root, mode=mode)
-app = WordGameGUI(root, mode="single")
-root.mainloop()
+parser = argparse.ArgumentParser(description="Five-by-Five Word Game")
+parser.add_argument(
+    "-lang",
+    "--language",
+    type=str,
+    default="pl",
+    choices=["eng", "pl"],
+    help="Language for the dictionary (default: pl)",
+)
+args = parser.parse_args()
+
+if __name__ == "__main__":
+    # mode = input("Choose game mode (single/multi): ").strip().lower()
+    root = tk.Tk()
+    # app = WordGameGUI(root, mode=mode)
+    app = WordGameGUI(root, mode="single")
+    root.mainloop()
