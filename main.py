@@ -5,17 +5,14 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk, messagebox
 from random import choice
-from tabulate import tabulate
 from time import time
-
-
+from tabulate import tabulate
 from core_func import my_bad_function
 from cells_func import (
     cells_to_play,
     create_array,
     possible_words_list,
 )
-
 from words_func import (
     add_letter,
     calculate_score,
@@ -278,9 +275,8 @@ class WordGameGUI:
             )
 
     def cpu_move(self):
-        # Start time
-        start_time = time()
         """Handle pass turn event (CPU's play)."""
+        start_time = time()  # Start time
         self.turn_label.config(text="Turn: CPU")
         self.master.update_idletasks()
 

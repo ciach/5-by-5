@@ -87,24 +87,6 @@ def start_word(length: int, words_list: list) -> str:
     return choice([word for word in words_list if len(word) == length])
 
 
-@lru_cache(maxsize=None)  # Cache results indefinitely
-def find_word(word_: str, words_list: Tuple[str, ...]) -> List[str]:
-    """Finds the words matching the given criteria in the "word" variable
-    by looking into the words list
-
-    Args:
-        word_ (str): Word to search for
-        words_list (list): List of words
-
-    Returns:
-        list: Words matching the criteria from "word" variable
-    """
-    word_ = word_.replace("#", ".").lower()
-    reg = re_compile(word_)
-
-    return [word for word in words_list if match(reg, word) and len(word) == len(word_)]
-
-
 def check_user_letter(user_letter_: str) -> bool:
     """Check if user input is a letter and has only one character
 
@@ -136,6 +118,36 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
     )
 
 
+@lru_cache(maxsize=269)  # Cache results indefinitely
+def find_word(word_: str, words_list: List[str]) -> List[str]:
+    """Finds the words matching the given criteria in the "word" variable
+    by looking into the words list using binary search."""
+
+    # Replace "#" with an empty string since we're checking prefixes
+    word_ = word_.replace("#", "").lower()
+
+    # Check if any word in the list starts with the given prefix
+    return (
+        [word_] if binary_search_prefix(words_list, word_) else []
+    )  # Return an empty list if no match is found
+
+
+def binary_search_prefix(words_list: List[str], prefix: str) -> bool:
+    """Check if any word in words_list starts with the given prefix using binary search."""
+    low, high = 0, len(words_list) - 1
+
+    while low <= high:
+        mid = (low + high) // 2
+        if words_list[mid].startswith(prefix):
+            return True
+        if words_list[mid] < prefix:
+            low = mid + 1
+        else:
+            high = mid - 1
+
+    return False
+
+
 def process_keys_chunk(args):
     chunk, words_list, words_played_set, word_dict = args
     results = []
@@ -152,6 +164,34 @@ def process_keys_chunk(args):
 def get_current_state_words(
     word_dict: dict, words_played: list, words_list: tuple
 ) -> list:
+    """
+    Executes the get_current_state_words function to retrieve the current state words based
+    on a word dictionary, a list of words played, and a list of words. The function splits
+    the word dictionary into multiple chunks and processes them in parallel using
+    multiprocessing. It returns a flattened list of current state words.
+
+    Args:
+        word_dict (dict): A dictionary containing words as keys and their corresponding values.
+        words_played (list): A list of words that have been played.
+        words_list (tuple): A tuple of words to search within.
+
+    Returns:
+        list: A list of current state words.
+
+    Example:
+        ```python
+        word_dict = {
+            "apple": 1,
+            "banana": 2,
+            "cherry": 3,
+            "orange": 4
+        }
+        words_played = ["apple", "banana"]
+        words_list = ("apple", "banana", "cherry", "orange")
+        result = get_current_state_words(word_dict, words_played, words_list)
+        print(result)  # Output: ["cherry", "orange"]
+        ```
+    """
     words_played_set = set(words_played)
 
     # Determine number of chunks based on available CPU cores
@@ -170,6 +210,4 @@ def get_current_state_words(
         results_list = pool.map(process_keys_chunk, args)
 
     # Flatten the results and return
-    current_state_words = [result for sublist in results_list for result in sublist]
-
-    return current_state_words
+    return [result for sublist in results_list for result in sublist]

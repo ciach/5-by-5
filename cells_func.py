@@ -129,7 +129,7 @@ def possible_words_list(
         # 'Free space' is represented by '#'. A valid word should have only one '#'.
         if word.count("#") == 1:
             possible_words["".join(word)] = path
-    return possible_words
+    return {key: possible_words[key] for key in sorted(possible_words.keys())}
 
 
 def cells_to_play(
