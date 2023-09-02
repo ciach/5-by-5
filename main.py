@@ -6,6 +6,7 @@ from tkinter import font
 from tkinter import ttk, messagebox
 from random import choice
 from tabulate import tabulate
+from time import time
 
 
 from core_func import my_bad_function
@@ -95,6 +96,12 @@ class WordGameGUI:
         self.cpu_score = 0  # CPU's score
         self.is_player_move_completed = False
         self.is_path_validated = False
+        self.is_timer_running = False
+
+        self.time_limit = 60  # Default to 60 seconds (1 minute)
+        self.selected_time = 180  # Default to 3 minutes (180 seconds)
+        self.time_remaining = self.time_limit
+
         self.current_word_path = []  # List to store the current word path
         self.player_words_paths = []  # List of lists to store the player's word paths
         self.word_from_path = []
@@ -146,22 +153,29 @@ class WordGameGUI:
         # Control Area GUI
         self.control_frame = ttk.Frame(master)
         self.control_frame.grid(row=1, column=0, sticky="ew")
+        # Timer label to display the time remaining
+        self.time_remaining = 60  # initial time (1 minute)
+        self.timer_label = ttk.Label(
+            self.control_frame, text=f"Time Remaining: {self.time_remaining}"
+        )
+        self.timer_label.grid(row=0, column=1, padx=5, pady=5)
+
         self.player_score_label = ttk.Label(self.control_frame)
-        self.player_score_label.grid(row=0, column=0, padx=20, pady=20)
+        self.player_score_label.grid(row=1, column=0, padx=20, pady=5)
         self.cpu_score_label = ttk.Label(self.control_frame)
-        self.cpu_score_label.grid(row=0, column=1, padx=20, pady=20)
+        self.cpu_score_label.grid(row=1, column=1, padx=20, pady=6)
         self.turn_label = ttk.Label(self.control_frame)
-        self.turn_label.grid(row=0, column=2, padx=20, pady=20)
+        self.turn_label.grid(row=1, column=2, padx=20, pady=5)
         self.pass_button = ttk.Button(
             self.control_frame, text="Pass", command=self.handle_pass
         )
-        self.pass_button.grid(row=1, column=0, padx=5, pady=5)
+        self.pass_button.grid(row=2, column=0, padx=5, pady=5)
 
         # Restart Button (New Game Button removed as requested)
         self.restart_button = ttk.Button(
             self.control_frame, text="Restart", command=self.restart_game
         )
-        self.restart_button.grid(row=1, column=1, padx=5, pady=5)
+        self.restart_button.grid(row=2, column=1, padx=5, pady=5)
 
         # Creating the Menu Bar
         self.menubar = tk.Menu(master)
@@ -174,9 +188,18 @@ class WordGameGUI:
 
         # User Time Dropdown
         self.time_menu = tk.Menu(self.menubar, tearoff=0)
-        self.time_menu.add_command(label="1 min", command=lambda: self.set_time(1))
-        self.time_menu.add_command(label="3 min", command=lambda: self.set_time(3))
-        self.time_menu.add_command(label="5 min", command=lambda: self.set_time(5))
+        self.time_menu.add_command(
+            label="No Limit", command=lambda: self.selected_time == 0
+        )
+        self.time_menu.add_command(
+            label="1 min", command=lambda: self.selected_time == 60
+        )
+        self.time_menu.add_command(
+            label="3 min", command=lambda: self.selected_time == 180
+        )
+        self.time_menu.add_command(
+            label="5 min", command=lambda: self.selected_time == 300
+        )
         self.menubar.add_cascade(label="User Time", menu=self.time_menu)
 
         # Display the Menu Bar
@@ -210,6 +233,7 @@ class WordGameGUI:
         self.update_valid_cells()  # Update the valid cells
         # Update the scoreboard with initial values
         self.update_scoreboard()
+        self.start_timer()
 
     def update_valid_cells(self):
         """
@@ -254,6 +278,8 @@ class WordGameGUI:
             )
 
     def cpu_move(self):
+        # Start time
+        start_time = time()
         """Handle pass turn event (CPU's play)."""
         self.turn_label.config(text="Turn: CPU")
         self.master.update_idletasks()
@@ -267,7 +293,7 @@ class WordGameGUI:
 
         words_dict = possible_words_list(possible_paths, self.my_array)
         current_state_words = get_current_state_words(
-            words_dict, self.played_words, self.long_words
+            words_dict, self.played_words, tuple(self.long_words)
         )
 
         if not current_state_words:
@@ -301,9 +327,17 @@ class WordGameGUI:
         self.is_path_validated = False
         self.is_player_move_completed = False
         self.master.update_idletasks()
+        self.stop_timer()
+        self.start_timer()
+        end_time = time()
+
+        # Calculate and print the duration
+        duration = end_time - start_time
+        print(f"(INFO): cpu_move took {duration:.2f} seconds to execute.")
 
     def restart_game(self):
         """Handle restart game event."""
+        self.stop_timer()
         self.initialize_game()
         self.update_valid_cells()
         self.update_scoreboard()
@@ -389,9 +423,9 @@ class WordGameGUI:
                 self.update_scoreboard()
                 self.update_valid_cells()
                 self.master.after(500, self.cpu_move)
-                print(
-                    f"(DEBUG): T:F: {self.played_words}, P:{self.player_words}, C:{self.cpu_words}"
-                )
+                # print(
+                #    f"(DEBUG): T:F: {self.played_words}, P:{self.player_words}, C:{self.cpu_words}"
+                # )
                 self.is_path_validated = True
                 self.word_from_path = []
         elif self.is_player_move_completed and self.is_path_validated:
@@ -422,7 +456,22 @@ class WordGameGUI:
         """Handle the event when the player decides to pass their turn."""
         self.played_words.append("( None )")
         self.update_scoreboard()
+        self.reset_timer()
         self.cpu_move()
+
+    def start_timer(self):
+        """Start the timer."""
+        self.time_left = self.selected_time  # Reset to the selected time
+        self.update_timer()
+
+    def update_timer(self):
+        pass
+
+    def reset_timer(self):
+        pass
+
+    def stop_timer(self):
+        pass
 
     def setup_endgame_scenario(self):
         """_summary_"""

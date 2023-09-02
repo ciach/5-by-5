@@ -7,6 +7,10 @@ from random import choice
 from re import compile as re_compile
 from re import match
 from time import time
+from functools import lru_cache
+from typing import Tuple
+from typing import List
+from multiprocessing import Pool, cpu_count
 
 
 def calculate_score(word):
@@ -83,7 +87,8 @@ def start_word(length: int, words_list: list) -> str:
     return choice([word for word in words_list if len(word) == length])
 
 
-def find_word(word_: str, words_list: list) -> list:
+@lru_cache(maxsize=None)  # Cache results indefinitely
+def find_word(word_: str, words_list: Tuple[str, ...]) -> List[str]:
     """Finds the words matching the given criteria in the "word" variable
     by looking into the words list
 
@@ -96,11 +101,8 @@ def find_word(word_: str, words_list: list) -> list:
     """
     word_ = word_.replace("#", ".").lower()
     reg = re_compile(word_)
-    return [
-        word
-        for word in words_list
-        if bool(match(reg, word)) and len(word) == len(word_)
-    ]
+
+    return [word for word in words_list if match(reg, word) and len(word) == len(word_)]
 
 
 def check_user_letter(user_letter_: str) -> bool:
@@ -134,24 +136,40 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
     )
 
 
-def get_current_state_words(
-    word_dict: dict,
-    words_played: list,
-    words_list: list,
-) -> list:
-    """
-    Retrieve all words that can be played in the current stage
-    and exclude the ones that are already played.
-    """
-    current_state_words = []
-    time_limit = 60  # seconds
-    start_time = time()
-    for key, path in word_dict.items():
+def process_keys_chunk(args):
+    chunk, words_list, words_played_set, word_dict = args
+    results = []
+
+    for key in chunk:
+        path = word_dict[key]
         answer = find_word(key, words_list)
-        if len(answer) > 0:
-            if modified_answer := [word for word in answer if word not in words_played]:
-                current_state_words.append([len(answer[0]), modified_answer, path])
-        if time() - start_time > time_limit:
-            break
-    # Filter out words that have already been played
-    return [word for word in current_state_words if word not in words_played]
+        if answer and answer[0] not in words_played_set:
+            results.append([len(answer[0]), answer, path])
+
+    return results
+
+
+def get_current_state_words(
+    word_dict: dict, words_played: list, words_list: tuple
+) -> list:
+    words_played_set = set(words_played)
+
+    # Determine number of chunks based on available CPU cores
+    num_chunks = cpu_count()
+
+    # Split word_dict.keys() into chunks
+    keys = list(word_dict.keys())
+    chunk_size = len(keys) // num_chunks
+    chunks = [keys[i : i + chunk_size] for i in range(0, len(keys), chunk_size)]
+
+    # Prepare arguments for multiprocessing
+    args = [(chunk, words_list, words_played_set, word_dict) for chunk in chunks]
+
+    # Use a pool of processes to execute the tasks
+    with Pool() as pool:
+        results_list = pool.map(process_keys_chunk, args)
+
+    # Flatten the results and return
+    current_state_words = [result for sublist in results_list for result in sublist]
+
+    return current_state_words
