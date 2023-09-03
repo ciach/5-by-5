@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk, messagebox
 from random import choice
-from time import time
+from time import time, sleep
 from tabulate import tabulate
 from core_func import my_bad_function
 from cells_func import (
@@ -112,7 +112,7 @@ class WordGameGUI:
 
         self.my_array = create_array(5, 5, "#")
         self.master = master
-        self.master.title("Gridly / Quintix")
+        self.master.title("Gridly / Quintix / Five by Five")
         self.master.geometry("830x330")
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Consolas", size=10)
@@ -164,16 +164,24 @@ class WordGameGUI:
         self.cpu_score_label.grid(row=3, column=1, padx=20, pady=6)
         self.turn_label = ttk.Label(self.control_frame)
         self.turn_label.grid(row=1, column=1, padx=20, pady=5)
+        self.re_do_path = ttk.Button(
+            self.control_frame,
+            text="Re-Do Path",
+            command=self.restart_game,
+            state=tk.DISABLED,
+        )
+
+        self.re_do_path.grid(row=0, column=0, padx=5, pady=5)
         self.pass_button = ttk.Button(
             self.control_frame, text="Pass", command=self.handle_pass
         )
-        self.pass_button.grid(row=0, column=0, padx=5, pady=5)
+        self.pass_button.grid(row=1, column=0, padx=5, pady=5)
 
         # Restart Button (New Game Button removed as requested)
         self.restart_button = ttk.Button(
             self.control_frame, text="Restart", command=self.restart_game
         )
-        self.restart_button.grid(row=1, column=0, padx=5, pady=5)
+        self.restart_button.grid(row=2, column=0, padx=5, pady=5)
 
         # Creating the Menu Bar
         self.menubar = tk.Menu(master)
@@ -411,23 +419,38 @@ class WordGameGUI:
     def cell_clicked(self, i, j):
         """
         Called when a cell (i, j) on the board is clicked.
-
-        if self.my_array[i][j] != "#":
-            return
         """
         if self.is_player_move_completed and not self.is_path_validated:
             self.buttons[(i, j)].config(style="Green.TButton")
             self.word_from_path.append(self.my_array[i][j])
+
+            # Check if the word from the path matches the entered word
             if "".join(self.word_from_path).lower() == self.word.lower():
                 self.played_words.append(self.word)
                 self.player_words.append(self.word)
                 self.player_score += calculate_score(self.word)
-                self.update_game_board()
-                self.update_scoreboard()
-                self.update_valid_cells()
-                self.master.after(500, self.cpu_move)
-                self.is_path_validated = True
+
+                # Use after with lambda to introduce a delay
+                self.master.after(1000, lambda: [
+                    self.update_game_board(),
+                    self.update_scoreboard(),
+                    self.update_valid_cells(),
+                    self.master.after(500, self.cpu_move),
+                    setattr(self, 'is_path_validated', True),
+                    setattr(self, 'word_from_path', [])
+                ])
+
+            # Check if word_from_path's length is same or more than word but they are not equal
+            elif (
+                len(self.word_from_path) >= len(self.word)
+                and "".join(self.word_from_path).lower() != self.word.lower()
+            ):
+                # Here, enable the re_do_path button and reset word_from_path
+                self.re_do_path.config(
+                    state=tk.NORMAL
+                )  # Assuming the button was disabled initially
                 self.word_from_path = []
+
         elif self.is_player_move_completed and self.is_path_validated:
             self.update_game_board()
             self.update_scoreboard()
