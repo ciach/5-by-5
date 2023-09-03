@@ -447,7 +447,7 @@ class WordGameGUI:
 
     def handle_pass(self):
         """Handle the event when the player decides to pass their turn."""
-        self.played_words.append("( None )")
+        self.player_words.append("( Pass )")
         self.update_scoreboard()
         self.reset_timer()
         self.cpu_move()
