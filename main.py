@@ -118,8 +118,8 @@ class WordGameGUI:
         default_font.configure(family="Consolas", size=10)
 
         style = ttk.Style()
-        style.configure("Green.TButton", background="green")
-        style.configure("Grey.TButton", background="grey")
+        style.configure("Green.TButton", background="lightgreen")
+        style.configure("Grey.TButton", background="lightblue")
 
         # Scoreboard GUI (TabulateLabel)
         self.scoreboard_label = TabulateLabel(
@@ -136,13 +136,14 @@ class WordGameGUI:
         self.board_frame = ttk.Frame(master)
         self.board_frame.grid(row=0, column=0, sticky="nsew")
         self.buttons = {}
+
         for i, j in itertools.product(range(5), range(5)):
             btn = ttk.Button(
                 self.board_frame,
                 text=self.my_array[i][j],
                 command=lambda i=i, j=j: self.cell_clicked(i, j),
             )
-            btn.grid(row=i, column=j, sticky="nsew", padx=5, pady=5)
+            btn.grid(row=i, column=j, sticky="nsew", padx=1, pady=1)
             self.buttons[(i, j)] = btn
             self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
             self.buttons[(i, j)].config(style="Grey.TButton")
@@ -158,21 +159,21 @@ class WordGameGUI:
         self.timer_label.grid(row=0, column=1, padx=5, pady=5)
 
         self.player_score_label = ttk.Label(self.control_frame)
-        self.player_score_label.grid(row=1, column=0, padx=20, pady=5)
+        self.player_score_label.grid(row=2, column=1, padx=20, pady=5)
         self.cpu_score_label = ttk.Label(self.control_frame)
-        self.cpu_score_label.grid(row=1, column=1, padx=20, pady=6)
+        self.cpu_score_label.grid(row=3, column=1, padx=20, pady=6)
         self.turn_label = ttk.Label(self.control_frame)
-        self.turn_label.grid(row=1, column=2, padx=20, pady=5)
+        self.turn_label.grid(row=1, column=1, padx=20, pady=5)
         self.pass_button = ttk.Button(
             self.control_frame, text="Pass", command=self.handle_pass
         )
-        self.pass_button.grid(row=2, column=0, padx=5, pady=5)
+        self.pass_button.grid(row=0, column=0, padx=5, pady=5)
 
         # Restart Button (New Game Button removed as requested)
         self.restart_button = ttk.Button(
             self.control_frame, text="Restart", command=self.restart_game
         )
-        self.restart_button.grid(row=2, column=1, padx=5, pady=5)
+        self.restart_button.grid(row=1, column=0, padx=5, pady=5)
 
         # Creating the Menu Bar
         self.menubar = tk.Menu(master)
@@ -276,6 +277,7 @@ class WordGameGUI:
 
     def cpu_move(self):
         """Handle pass turn event (CPU's play)."""
+
         start_time = time()  # Start time
         self.turn_label.config(text="Turn: CPU")
         self.master.update_idletasks()
