@@ -459,7 +459,7 @@ class WordGameGUI:
 
     def start_timer(self):
         """Start the timer."""
-        self.time_left = self.selected_time  # Reset to the selected time
+        self.time_remaining = self.selected_time  # Reset to the selected time
         self.update_timer()
 
     def update_timer(self):
