@@ -279,7 +279,8 @@ class WordGameGUI:
         start_time = time()  # Start time
         self.turn_label.config(text="Turn: CPU")
         self.master.update_idletasks()
-
+        # Start time
+        start_time = time()
         possible_paths = my_bad_function(
             self.my_array, cells_to_play(self.my_array, "#")
         )
@@ -295,7 +296,7 @@ class WordGameGUI:
         if not current_state_words:
             print("(INFO): No words found in range 4-10, trying 1-4")
             current_state_words = get_current_state_words(
-                words_dict, self.played_words, self.short_words
+                words_dict, sorted(self.played_words), self.short_words
             )
 
         sorted_current_state_words = sorted(current_state_words, key=lambda x: -x[0])
@@ -312,7 +313,8 @@ class WordGameGUI:
         for letter, position in zip(next_word, next_word_list[2]):
             add_letter(self.my_array, letter, position[0], position[1])
             self.buttons[(position[0], position[1])].config(text=letter.upper())
-
+        # End time
+        end_time = time()
         self.played_words.append(next_word)
         self.cpu_words.append(next_word)
         self.cpu_score += calculate_score(next_word)
@@ -419,9 +421,6 @@ class WordGameGUI:
                 self.update_scoreboard()
                 self.update_valid_cells()
                 self.master.after(500, self.cpu_move)
-                # print(
-                #    f"(DEBUG): T:F: {self.played_words}, P:{self.player_words}, C:{self.cpu_words}"
-                # )
                 self.is_path_validated = True
                 self.word_from_path = []
         elif self.is_player_move_completed and self.is_path_validated:
@@ -429,8 +428,6 @@ class WordGameGUI:
             self.update_scoreboard()
             self.update_valid_cells()
             self.master.after(500, self.cpu_move)
-            print(f"T:T:{self.played_words}")
-
         else:
             # Show the letter entry dialog box
             self.show_letter_entry_dialog(i, j)
