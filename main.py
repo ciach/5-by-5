@@ -220,6 +220,9 @@ class WordGameGUI:
         self.played_words = []
         self.player_words = []
         self.cpu_words = []
+        self.is_player_move_completed = False
+        self.is_path_validated = False
+        self.word = ""
         self.my_array = create_array(5, 5, "#")
         first_word = start_word(
             5, self.long_words
