@@ -112,7 +112,7 @@ class WordGameGUI:
 
         self.my_array = create_array(5, 5, "#")
         self.master = master
-        self.master.title("Five by Five")
+        self.master.title("Gridly / Quintix")
         self.master.geometry("830x330")
         default_font = font.nametofont("TkDefaultFont")
         default_font.configure(family="Consolas", size=10)
