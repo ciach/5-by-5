@@ -143,7 +143,7 @@ class WordGameGUI:
                 text=self.my_array[i][j],
                 command=lambda i=i, j=j: self.cell_clicked(i, j),
             )
-            btn.grid(row=i, column=j, sticky="nsew", padx=1, pady=1)
+            btn.grid(row=i, column=j, sticky="nsew", padx=0, pady=0)
             self.buttons[(i, j)] = btn
             self.buttons[(i, j)].config(text=self.my_array[i][j].upper())
             self.buttons[(i, j)].config(style="Grey.TButton")
