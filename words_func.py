@@ -107,8 +107,6 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
         bool: True if the user word is valid
     """
 
-    # depending on a lenght of the user word, need to check if rest of the letters exist in array
-
     return bool(
         user_word_ and user_word_ not in words_played_ and user_word_ in words_list
     )
@@ -127,6 +125,16 @@ def find_word(word_: str, words_list: list) -> list:
 
 
 def process_keys_chunk(args):
+    """
+    Process a chunk of keys to find words in a given word list. The function iterates over each key in the chunk, retrieves the corresponding path from the word dictionary, and searches for the word in the word list. If a word is found and it has not been played before, it is added to the results list along with its length and path.
+
+    Args:
+        args (tuple): A tuple containing the chunk of keys, the word list, the set of played words, and the word dictionary.
+
+    Returns:
+        list: A list of results, where each result is a sublist containing the length of the found word, the word itself, and its path.
+    """
+
     chunk, words_list, words_played_set, word_dict = args
     results = []
 
@@ -142,6 +150,34 @@ def process_keys_chunk(args):
 def get_current_state_words(
     word_dict: dict, words_played: list, words_list: tuple
 ) -> list:
+    """
+    Retrieve all words that can be played in the current state based on a word dictionary,
+    a list of words played, and a list of words. The function splits the word dictionary
+    into multiple chunks and processes them in parallel using multiprocessing.
+    It returns a flattened list of current state words.
+
+    Args:
+        word_dict (dict): A dictionary containing words as keys and their corresponding values.
+        words_played (list): A list of words that have been played.
+        words_list (tuple): A tuple of words to search within.
+
+    Returns:
+        list: A list of current state words.
+
+    Example:
+        ```python
+        word_dict = {
+            "apple": 1,
+            "banana": 2,
+            "cherry": 3,
+            "orange": 4
+        }
+        words_played = ["apple", "banana"]
+        words_list = ("apple", "banana", "cherry", "orange")
+        result = get_current_state_words(word_dict, words_played, words_list)
+        print(result)  # Output: [["cherry", (3, 4), [(0, 0), (1, 0), (2, 0)]]]
+        ```
+    """
     words_played_set = set(words_played)
 
     # Determine number of chunks based on available CPU cores
