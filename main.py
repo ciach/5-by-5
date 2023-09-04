@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import font
 from tkinter import ttk, messagebox
 from random import choice
-from time import time, sleep
+from time import time
 from tabulate import tabulate
 from core_func import my_bad_function
 from cells_func import (
@@ -96,8 +96,8 @@ class WordGameGUI:
         self.is_timer_running = False
 
         self.time_limit = 60  # Default to 60 seconds (1 minute)
-        self.selected_time = 180  # Default to 3 minutes (180 seconds)
         self.time_remaining = self.time_limit
+        self.is_input_in_progress = False
 
         self.current_word_path = []  # List to store the current word path
         self.player_words_paths = []  # List of lists to store the player's word paths
@@ -152,7 +152,6 @@ class WordGameGUI:
         self.control_frame = ttk.Frame(master)
         self.control_frame.grid(row=1, column=0, sticky="ew")
         # Timer label to display the time remaining
-        self.time_remaining = 60  # initial time (1 minute)
         self.timer_label = ttk.Label(
             self.control_frame, text=f"Time Remaining: {self.time_remaining}"
         )
@@ -195,16 +194,14 @@ class WordGameGUI:
         # User Time Dropdown
         self.time_menu = tk.Menu(self.menubar, tearoff=0)
         self.time_menu.add_command(
-            label="No Limit", command=lambda: self.selected_time == 0
+            label="No Limit", command=lambda: self.time_limit == 0
+        )
+        self.time_menu.add_command(label="1 min", command=lambda: self.time_limit == 60)
+        self.time_menu.add_command(
+            label="3 min", command=lambda: self.time_limit == 180
         )
         self.time_menu.add_command(
-            label="1 min", command=lambda: self.selected_time == 60
-        )
-        self.time_menu.add_command(
-            label="3 min", command=lambda: self.selected_time == 180
-        )
-        self.time_menu.add_command(
-            label="5 min", command=lambda: self.selected_time == 300
+            label="5 min", command=lambda: self.time_limit == 300
         )
         self.menubar.add_cascade(label="User Time", menu=self.time_menu)
 
@@ -230,6 +227,7 @@ class WordGameGUI:
         self.cpu_words = []
         self.is_player_move_completed = False
         self.is_path_validated = False
+        self.is_input_in_progress = False
         self.word = ""
         self.my_array = create_array(5, 5, "#")
         first_word = start_word(
@@ -326,6 +324,7 @@ class WordGameGUI:
         for letter, position in zip(next_word, next_word_list[2]):
             add_letter(self.my_array, letter, position[0], position[1])
             self.buttons[(position[0], position[1])].config(text=letter.upper())
+            self.buttons[(position[0], position[1])].config(style="Green.TButton")
         # End time
         end_time = time()
         self.played_words.append(next_word)
@@ -333,14 +332,18 @@ class WordGameGUI:
         self.cpu_score += calculate_score(next_word)
         self.update_scoreboard()
         self.master.update_idletasks()
-        self.update_valid_cells()
-        self.turn_label.config(text="Turn: Player")
+        self.master.after(
+            1750,
+            lambda: [
+                self.update_game_board(),
+                self.update_valid_cells(),
+                self.turn_label.config(text="Turn: Player"),
+            ],
+        )
         self.is_path_validated = False
         self.is_player_move_completed = False
         self.master.update_idletasks()
-        self.stop_timer()
-        self.start_timer()
-        end_time = time()
+        self.is_input_in_progress = True
 
         # Calculate and print the duration
         duration = end_time - start_time
@@ -417,48 +420,61 @@ class WordGameGUI:
             self.is_player_move_completed = False
 
     def cell_clicked(self, i, j):
-        """
-        Called when a cell (i, j) on the board is clicked.
-        """
-        if self.is_player_move_completed and not self.is_path_validated:
-            self.buttons[(i, j)].config(style="Green.TButton")
-            self.word_from_path.append(self.my_array[i][j])
-
-            # Check if the word from the path matches the entered word
-            if "".join(self.word_from_path).lower() == self.word.lower():
-                self.played_words.append(self.word)
-                self.player_words.append(self.word)
-                self.player_score += calculate_score(self.word)
-
-                # Use after with lambda to introduce a delay
-                self.master.after(1000, lambda: [
-                    self.update_game_board(),
-                    self.update_scoreboard(),
-                    self.update_valid_cells(),
-                    self.master.after(500, self.cpu_move),
-                    setattr(self, 'is_path_validated', True),
-                    setattr(self, 'word_from_path', [])
-                ])
-
-            # Check if word_from_path's length is same or more than word but they are not equal
-            elif (
-                len(self.word_from_path) >= len(self.word)
-                and "".join(self.word_from_path).lower() != self.word.lower()
-            ):
-                # Here, enable the re_do_path button and reset word_from_path
-                self.re_do_path.config(
-                    state=tk.NORMAL
-                )  # Assuming the button was disabled initially
-                self.word_from_path = []
-
-        elif self.is_player_move_completed and self.is_path_validated:
-            self.update_game_board()
-            self.update_scoreboard()
-            self.update_valid_cells()
-            self.master.after(500, self.cpu_move)
+        """Called when a cell (i, j) on the board is clicked."""
+        if self.is_player_move_completed:
+            if not self.is_path_validated:
+                self.handle_unvalidated_path(i, j)
+            else:
+                self.handle_validated_path()
         else:
             # Show the letter entry dialog box
             self.show_letter_entry_dialog(i, j)
+
+    def handle_unvalidated_path(self, i, j):
+        """Handles actions when a cell is clicked and the player's
+        move path is not yet validated."""
+        self.buttons[(i, j)].config(style="Green.TButton")
+        self.word_from_path.append(self.my_array[i][j])
+        current_word = "".join(self.word_from_path).lower()
+
+        if current_word == self.word.lower():
+            self.update_for_correct_path()
+        elif (
+            len(self.word_from_path) >= len(self.word)
+            and current_word != self.word.lower()
+        ):
+            self.reset_for_incorrect_path()
+
+    def handle_validated_path(self):
+        """Handles actions when a cell is clicked and
+        the player's move path is already validated."""
+        self.update_game_board()
+        self.update_scoreboard()
+        self.update_valid_cells()
+        self.master.after(500, self.cpu_move)
+
+    def update_for_correct_path(self):
+        """Update actions for a correct path."""
+        self.played_words.append(self.word)
+        self.player_words.append(self.word)
+        self.player_score += calculate_score(self.word)
+        self.update_scoreboard()
+
+        # Introduce a delay then update game board and valid cells
+        self.master.after(1750, self.post_correct_path_updates)
+
+    def post_correct_path_updates(self):
+        """Actions to perform after a delay following a correct path selection."""
+        self.update_game_board()
+        self.update_valid_cells()
+        self.master.after(500, self.cpu_move)
+        self.is_path_validated = True
+        self.word_from_path = []
+
+    def reset_for_incorrect_path(self):
+        """Reset actions for an incorrect path."""
+        self.re_do_path.config(state=tk.NORMAL)
+        self.word_from_path = []
 
     def announce_winner(self):
         """_summary_"""
@@ -481,9 +497,7 @@ class WordGameGUI:
         self.cpu_move()
 
     def start_timer(self):
-        """Start the timer."""
-        self.time_remaining = self.selected_time  # Reset to the selected time
-        self.update_timer()
+        pass
 
     def update_timer(self):
         pass
