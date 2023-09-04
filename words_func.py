@@ -112,35 +112,51 @@ def check_user_word(user_word_: str, words_played_: list, words_list: list) -> b
     )
 
 
-def find_word(word_: str, words_list: list) -> list:
-    """Finds the words matching the given criteria in the "word" variable
-    by looking into the words list."""
+def preprocess_word_list(words_list):
+    word_dict_by_length = {}
+    for word in words_list:
+        len_word = len(word)
+        if len_word not in word_dict_by_length:
+            word_dict_by_length[len_word] = []
+        word_dict_by_length[len_word].append(word)
+    return word_dict_by_length
+
+
+def find_word(word_: str, word_dict_by_length: dict) -> list:
     word_ = word_.replace("#", ".").lower()
     reg = re_compile(word_)
     word_len = len(word_)
 
-    return [
-        word for word in words_list if len(word) == word_len and fullmatch(reg, word)
-    ]
+    # Directly get words of the desired length
+    candidates = word_dict_by_length.get(word_len, [])
+
+    return [word for word in candidates if fullmatch(reg, word)]
 
 
 def process_keys_chunk(args):
     """
-    Process a chunk of keys to find words in a given word list. The function iterates over each key in the chunk, retrieves the corresponding path from the word dictionary, and searches for the word in the word list. If a word is found and it has not been played before, it is added to the results list along with its length and path.
+    Process a chunk of keys to find words in a given word list. The function iterates over each
+    key in the chunk, retrieves the corresponding path from the word dictionary, and searches for
+    the word in the word list. If a word is found and it has not been played before, it is added
+    to the results list along with its length and path.
 
     Args:
-        args (tuple): A tuple containing the chunk of keys, the word list, the set of played words, and the word dictionary.
+        args (tuple): A tuple containing the chunk of keys, the word list, the set of played words,
+        and the word dictionary.
 
     Returns:
-        list: A list of results, where each result is a sublist containing the length of the found word, the word itself, and its path.
+        list: A list of results, where each result is a sublist containing the length of the
+        found word, the word itself, and its path.
     """
 
     chunk, words_list, words_played_set, word_dict = args
+    word_dict_by_length = preprocess_word_list(words_list)
+
     results = []
 
     for key in chunk:
         path = word_dict[key]
-        answer = find_word(key, words_list)
+        answer = find_word(key, word_dict_by_length)
         if answer and answer[0] not in words_played_set:
             results.append([len(answer[0]), answer, path])
 
