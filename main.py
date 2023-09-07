@@ -495,6 +495,8 @@ class WordGameGUI:
         self.update_scoreboard()
         self.reset_timer()
         self.cpu_move()
+        print(self.played_words)
+        print(self.my_array)
 
     def start_timer(self):
         pass
