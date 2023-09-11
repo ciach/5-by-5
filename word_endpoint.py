@@ -1,3 +1,5 @@
+import numpy as np
+
 from core_func import my_bad_function
 from cells_func import (
     cells_to_play,
@@ -9,8 +11,8 @@ from words_func import (
 )
 
 from flask import Flask, request, jsonify
-import numpy as np
 from random import choice
+from time import time
 
 app = Flask(__name__)
 short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 10)
@@ -18,6 +20,8 @@ short_words, long_words = load_words("rzeczowniki_rm.txt", 4, 10)
 
 @app.route("/get-word", methods=["POST"])
 def get_word():
+    # Start the timer
+    start_time = time()
     # Extract my_array and played_words from the incoming JSON request
     data = request.json
     my_array_np = np.char.array(data["my_array"])
@@ -48,8 +52,10 @@ def get_word():
         next_word = choice(next_word_list[1])
         next_word_path = next_word_list[2]
 
-    return jsonify({"word": next_word, "path": next_word_path})
+    # Stop the timer
+    compute_time = time() - start_time
+    return jsonify({"path": next_word_path, "time": compute_time, "word": next_word})
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
