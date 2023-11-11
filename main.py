@@ -59,9 +59,7 @@ class CustomInputDialog(tk.Toplevel):
 
 class TabulateLabel(tk.Label):
     def __init__(self, parent, player_words, cpu_words, **kwargs):
-        super().__init__(
-            parent, font=("Consolas", 10), justify=tk.LEFT, anchor="nw", **kwargs
-        )
+        super().__init__(parent, justify=tk.LEFT, anchor="nw", **kwargs)
 
         # Determine the length of the longer list
         max_length = max(len(player_words), len(cpu_words))
@@ -91,7 +89,9 @@ class WordGameGUI:
         self.player_score = 0  # Player's score
         self.word = ""  # Word entered by the player
         self.cpu_score = 0  # CPU's score
+        self.is_cpu_move = False  # Flag to indicate if it's the CPU's move
         self.is_player_move_completed = False
+        self.is_player_first_click = True
         self.is_path_validated = False
         self.is_timer_running = False
 
@@ -105,7 +105,7 @@ class WordGameGUI:
 
         # Choose the appropriate dictionary based on the language argument
         if args.language == "pl":
-            dictionary_file = "rzeczowniki_rm.txt"
+            dictionary_file = "dict.txt"
         else:  # Default to English
             dictionary_file = "singular_nouns.txt"
         self.short_words, self.long_words = load_words(dictionary_file, 4, 10)
@@ -166,7 +166,7 @@ class WordGameGUI:
         self.re_do_path = ttk.Button(
             self.control_frame,
             text="Re-Do Path",
-            command=self.restart_game,
+            command=self.reset_for_incorrect_path,
             state=tk.DISABLED,
         )
 
@@ -226,6 +226,7 @@ class WordGameGUI:
         self.player_words = []
         self.cpu_words = []
         self.is_player_move_completed = False
+        self.is_player_first_click = True
         self.is_path_validated = False
         self.is_input_in_progress = False
         self.word = ""
@@ -256,7 +257,7 @@ class WordGameGUI:
         for i, j in valid_cells:
             self.buttons[(i, j)].config(state=tk.NORMAL)
 
-        # Check if the game is over (e.g., only one cell left on the board)
+        # Check if the game is over (e.g., no empty cell left on the board)
         empty_cells = sum(
             self.my_array[i][j] == "#" for i, j in itertools.product(range(5), range(5))
         )
@@ -286,7 +287,7 @@ class WordGameGUI:
 
     def cpu_move(self):
         """Handle pass turn event (CPU's play)."""
-
+        self.is_cpu_move = True
         start_time = time()  # Start time
         self.turn_label.config(text="Turn: CPU")
         self.master.update_idletasks()
@@ -325,6 +326,7 @@ class WordGameGUI:
             add_letter(self.my_array, letter, position[0], position[1])
             self.buttons[(position[0], position[1])].config(text=letter.upper())
             self.buttons[(position[0], position[1])].config(style="Green.TButton")
+
         # End time
         end_time = time()
         self.played_words.append(next_word)
@@ -344,10 +346,12 @@ class WordGameGUI:
         self.is_player_move_completed = False
         self.master.update_idletasks()
         self.is_input_in_progress = True
+        self.is_player_first_click = True
 
         # Calculate and print the duration
         duration = end_time - start_time
         print(f"(INFO): cpu_move took {duration:.2f} seconds to execute.")
+        self.is_cpu_move = False
 
     def restart_game(self):
         """Handle restart game event."""
@@ -421,18 +425,45 @@ class WordGameGUI:
 
     def cell_clicked(self, i, j):
         """Called when a cell (i, j) on the board is clicked."""
-        if self.is_player_move_completed:
-            if not self.is_path_validated:
-                self.handle_unvalidated_path(i, j)
-            else:
-                self.handle_validated_path()
-        else:
-            # Show the letter entry dialog box
+        # If it's the player's first click and the clicked cell is not '#', just return
+        if (
+            self.is_player_first_click
+            and self.my_array[i][j] != "#"
+            or self.is_cpu_move
+        ):
+            return
+
+        # If the first move is being made by the player, set the is_player_first_click to False
+        if self.is_player_first_click:
+            self.is_player_first_click = False
+
+        # If the player move is not completed, show the letter entry dialog box
+        if not self.is_player_move_completed:
             self.show_letter_entry_dialog(i, j)
+            return  # Return early, no further processing needed
+
+        # If the path is not validated, handle the unvalidated path
+        if not self.is_path_validated:
+            self.handle_unvalidated_path(i, j)
+            return  # Return early, no further processing needed
+
+        # If we've gotten this far, handle the validated path
+        self.handle_validated_path()
 
     def handle_unvalidated_path(self, i, j):
-        """Handles actions when a cell is clicked and the player's
-        move path is not yet validated."""
+        """
+        Handles an unvalidated path in the word grid.
+
+        Args:
+            i: The row index of the button in the grid.
+            j: The column index of the button in the grid.
+
+        Returns:
+            None
+
+        Examples:
+            handle_unvalidated_path(2, 3)
+        """
         self.buttons[(i, j)].config(style="Green.TButton")
         self.word_from_path.append(self.my_array[i][j])
         current_word = "".join(self.word_from_path).lower()
@@ -467,6 +498,7 @@ class WordGameGUI:
         """Actions to perform after a delay following a correct path selection."""
         self.update_game_board()
         self.update_valid_cells()
+        self.is_player_first_click = True
         self.master.after(500, self.cpu_move)
         self.is_path_validated = True
         self.word_from_path = []
@@ -495,8 +527,9 @@ class WordGameGUI:
         self.update_scoreboard()
         self.reset_timer()
         self.cpu_move()
-        print(self.played_words)
-        print(self.my_array)
+        # DEBUG lines
+        # print(self.played_words)
+        # print(self.my_array)
 
     def start_timer(self):
         pass
