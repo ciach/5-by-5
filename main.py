@@ -6,7 +6,8 @@ from tkinter import font
 from tkinter import ttk, messagebox
 from random import choice
 from time import time
-from tabulate import tabulate
+from custom_input_dialog import CustomInputDialog
+from tabulate_label import TabulateLabel
 from core_func import my_bad_function
 from cells_func import (
     cells_to_play,
@@ -23,64 +24,6 @@ from words_func import (
 )
 
 
-class CustomInputDialog(tk.Toplevel):
-    def __init__(self, parent, title, message):
-        super().__init__(parent)
-        self.title(title)
-        self.result = None  # default value
-        self.label = tk.Label(self, text=message)
-        self.label.pack(padx=10, pady=10)
-
-        self.entry = tk.Entry(self)
-        self.entry.pack(padx=10, pady=10)
-        self.entry.bind("<Return>", lambda event=None: self.on_ok())
-        self.entry.focus_set()
-
-        self.ok_button = tk.Button(self, text="OK", command=self.on_ok)
-        self.ok_button.pack(side=tk.LEFT, padx=10, pady=10)
-
-        self.cancel_button = tk.Button(self, text="Cancel", command=self.on_cancel)
-        self.cancel_button.pack(side=tk.LEFT, padx=10, pady=10)
-
-        x_pos = parent.winfo_x() + 520
-        y_pos = parent.winfo_y() + 10
-        self.geometry(f"+{x_pos}+{y_pos}")
-
-    def on_ok(self):
-        """on clicking OK button"""
-        self.result = self.entry.get()
-        self.destroy()
-
-    def on_cancel(self):
-        """on clicking cancel button"""
-        self.result = None
-        self.destroy()
-
-
-class TabulateLabel(tk.Label):
-    def __init__(self, parent, player_words, cpu_words, **kwargs):
-        super().__init__(parent, justify=tk.LEFT, anchor="nw", **kwargs)
-
-        # Determine the length of the longer list
-        max_length = max(len(player_words), len(cpu_words))
-
-        # Dynamically create the data based on the length of the longer list
-        data = [("Player", "Points", "Cpu", "Points")]
-        for i in range(max_length):
-            player_word = player_words[i] if i < len(player_words) else ""
-            cpu_word = cpu_words[i] if i < len(cpu_words) else ""
-            player_points = str(calculate_score(player_word)) if player_word else ""
-            cpu_points = str(calculate_score(cpu_word)) if cpu_word else ""
-
-            data.append(
-                (player_word.upper(), player_points, cpu_word.upper(), cpu_points)
-            )
-
-        text = tabulate(data, headers="firstrow", tablefmt="github", showindex=False)
-        self.configure(text=text)
-
-
-# Updating the WordGameGUI class to integrate these functions
 class WordGameGUI:
     def __init__(self, master, mode="single"):
         self.played_words = []  # List to store words that have been played
@@ -367,7 +310,7 @@ class WordGameGUI:
         """
         # Ask the user for a letter
         letter_dialog = CustomInputDialog(
-            self.master, "Input", "Enter a single letter:"
+            self.master, "Input", "Enter a single letter:", OneLetter=True
         )
         self.master.wait_window(letter_dialog)
 
